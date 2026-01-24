@@ -1,0 +1,285 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Product — Slider Demo</title>
+	<style>
+		:root{--slider-size:600px;--brand:#0b6e4f;--brand-dark:#07573f;--accent:#ffd166;--text:#0f1724;--muted:#6b7280;--max-width:1100px}
+		body{font-family:Arial,Helvetica,sans-serif;margin:0;color:#222}
+		.container{max-width:1000px;margin:96px auto 24px;padding:0 16px}
+
+		/* Navbar (copied from home.html) */
+		.navbar{background:linear-gradient(180deg, #fff 0%, #f8fafc 100%);border-bottom:1px solid #e6edf0;position:sticky;top:0;z-index:1000}
+		.nav-container{display:flex;align-items:center;max-width:var(--max-width);margin:0 auto;padding:0 16px}
+		.brand{display:flex;align-items:center;gap:.6rem;font-weight:700;color:var(--brand);text-decoration:none}
+		.brand .logo{width:44px;height:44px;border-radius:8px;display:inline-block;object-fit:cover;vertical-align:middle}
+		.nav-links{display:flex;gap:1rem;align-items:center;margin-left:auto}
+		.nav-links a{color:var(--text);text-decoration:none;padding:.45rem .6rem;border-radius:6px;font-weight:600}
+		.nav-links a:hover,.nav-links a:focus{background:#f1f6f7;color:var(--brand-dark);outline:none}
+		.cta{background:var(--brand);color:white;padding:.5rem .9rem;border-radius:8px;text-decoration:none}
+		.cta:hover{background:var(--brand-dark)}
+		.menu-toggle{display:none;background:transparent;border:0;padding:.4rem;border-radius:6px}
+		.menu-toggle:focus{outline:2px solid #cfeee0}
+		@media (max-width:900px){
+			.nav-links{position:absolute;left:0;right:0;top:64px;background:white;flex-direction:column;padding:1rem;gap:.5rem;border-bottom:1px solid #eef3f4;transform:translateY(-10px);opacity:0;pointer-events:none;transition:200ms ease;box-shadow:0 6px 18px rgba(11,110,79,0.06)}
+			.nav-links.open{transform:translateY(0);opacity:1;pointer-events:auto}
+			.menu-toggle{display:inline-flex;align-items:center}
+			.nav-container{position:relative}
+		}
+
+		.product{display:grid;grid-template-columns:auto 360px;gap:24px;align-items:start}
+		/* unit toggle and flavor chips */
+		.unit-toggle input{display:none}
+		.unit-toggle label{display:inline-block;padding:.45rem .7rem;border:1px solid #e6edf0;border-radius:6px;margin-right:6px;cursor:pointer;background:#fff;font-weight:600}
+		.unit-toggle input:checked + label{background:var(--brand);color:#fff;border-color:var(--brand)}
+		.flavors input{display:none}
+		.flavors label{display:inline-block;padding:.45rem .7rem;border:1px solid #e6edf0;border-radius:999px;margin:4px 6px 4px 0;cursor:pointer;background:#fff}
+		.flavors input:checked + label{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+		/* Slider (constrained square, floats left on wide screens) */
+		.slider{position:relative;overflow:hidden;border-radius:8px;background:#000;max-width:var(--slider-size);float:left;margin-right:16px}
+		.slides{display:flex;transition:transform .5s ease;width:100%}
+		.slide{min-width:100%;box-sizing:border-box}
+		.slide img{display:block;width:100%;height:var(--slider-size);object-fit:cover}
+
+		.nav-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);border:0;color:#fff;padding:10px 14px;border-radius:50%;cursor:pointer}
+		.prev{left:12px}
+		.next{right:12px}
+
+		.dots{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;display:flex;gap:8px}
+		.dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.5);cursor:pointer}
+		.dot.active{background:#fff}
+
+		/* Product details */
+		.details{background:#fff;padding:18px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+		.price{font-size:1.25rem;color:#e53935;margin:8px 0}
+		.buy{background:#28a745;color:#fff;border:0;padding:10px 14px;border-radius:6px;cursor:pointer}
+
+		@media (max-width:860px){
+			:root{--slider-size:100%}
+			.product{grid-template-columns:1fr}
+			.slider{float:none;max-width:100%;margin-right:0}
+			.slide img{height:auto}
+		}
+	</style>
+</head>
+<body>
+	<header class="navbar">
+		<div class="nav-container">
+			<a class="brand" href="home.html">
+				<img src="logo.png" alt="GAINZ logo" class="logo">
+				<span>GAINZ</span>
+			</a>
+			<button class="menu-toggle" aria-controls="primary-navigation" aria-expanded="false" aria-label="Toggle menu">
+				<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<path d="M4 7H20M4 12H20M4 17H20" stroke="#0f1724" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+			</button>
+			<nav id="primary-navigation" class="nav-links" aria-label="Main navigation">
+				<a href="home.html">Home</a>
+				<a href="product1.html">Products</a>
+				<a href="#">Contact</a>
+				<a href="#cart" class="cta" aria-label="View cart">Cart</a>
+			</nav>
+		</div>
+	</header>
+
+	<div class="container">
+
+		<div class="product">
+			<div>
+				<div class="slider" id="productSlider" aria-roledescription="carousel">
+					<div class="slides">
+						<div class="slide"><img src="whey.jpg" alt="Product view 1"></div>
+						<div class="slide"><img src="2.webp" alt="Product view 2"></div>
+						<div class="slide"><img src="3.webp" alt="Product view 3"></div>
+                        <div class="slide"><img src="4.webp" alt="Product view 4"></div>
+                        <div class="slide"><img src="5.webp" alt="Product view 5"></div>
+                        <div class="slide"><img src="6.webp" alt="Product view 6"></div>
+                        <div class="slide"><img src="7.webp" alt="Product view 7"></div>
+                        <div class="slide"><img src="8.webp" alt="Product view 8"></div>
+                        <div class="slide"><img src="9.webp" alt="Product view 9"></div>
+                        <div class="slide"><img src="10.webp" alt="Product view 10"></div>
+					</div>
+					<button class="nav-btn prev" aria-label="Previous slide">‹</button>
+					<button class="nav-btn next" aria-label="Next slide">›</button>
+					<div class="dots" aria-hidden="false"></div>
+				</div>
+			</div>
+
+			<aside class="details">
+				<div class="product-card-right">
+					<h2>Whey Protein — 2kg</h2>
+					<div class="muted">Rich chocolate flavor</div>
+					<div class="price">₹2700</div>
+					<p>High-quality whey protein to support muscle growth and recovery. Mixes easily and tastes great.</p>
+
+					<div style="margin:12px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+						<label style="font-weight:600">Size:</label>
+						<select id="sizeSelect" aria-label="Choose size" style="padding:.45rem;border-radius:6px;border:1px solid #e6edf0">
+							<option>2kg</option>
+							<option>1kg</option>
+						</select>
+					</div>
+
+					<div style="margin-top:8px">
+						<div style="margin-bottom:6px;font-weight:600">Unit:</div>
+						<div class="unit-toggle" role="radiogroup" aria-label="Weight unit">
+							<input type="radio" id="unit-kg" name="unit" value="kg" checked>
+							<label for="unit-kg">kg</label>
+							<input type="radio" id="unit-lbs" name="unit" value="lbs">
+							<label for="unit-lbs">lbs</label>
+						</div>
+					</div>
+
+					<div style="margin-top:12px">
+						<div style="font-weight:600;margin-bottom:6px">Flavors</div>
+						<div class="flavors" role="radiogroup" aria-label="Flavor options">
+							<input type="radio" id="flavor-choco" name="flavor" value="chocolate" checked>
+							<label for="flavor-choco">Chocolate Supreme</label>
+							<input type="radio" id="flavor-mawa" name="flavor" value="mawa">
+							<label for="flavor-mawa">Mawa Kulfi</label>
+							<input type="radio" id="flavor-mango" name="flavor" value="mango">
+							<label for="flavor-mango">Mango Smoothie</label>
+							<input type="radio" id="flavor-kesar" name="flavor" value="kesar">
+							<label for="flavor-kesar">Kesar Pista</label>
+							<input type="radio" id="flavor-cafe" name="flavor" value="cafe">
+							<label for="flavor-cafe">Cafe Mocha</label>
+							<input type="radio" id="flavor-unflav" name="flavor" value="unflavored">
+							<label for="flavor-unflav">Unflavored</label>
+							<input type="radio" id="flavor-vanilla" name="flavor" value="vanilla">
+							<label for="flavor-vanilla">Vanilla Bean</label>
+						</div>
+
+						<label style="font-weight:600;margin-left:8px">Qty:</label>
+						<input type="number" value="1" min="1" style="width:72px;padding:.45rem;border-radius:6px;border:1px solid #e6edf0">
+					</div>
+
+					<div style="display:flex;gap:10px;margin-top:6px">
+						<a class="cta" href="#">Buy Now</a>
+						<button class="buy" style="background:#fff;color:var(--brand);border:1px solid var(--brand)">Add to Cart</button>
+					</div>
+
+					<div class="muted" style="margin-top:12px">Free shipping over ₹2000 • 30-day returns</div>
+				</div>
+			</aside>
+		</div>
+	</div>
+
+	<script>
+		(function(){
+			const slider = document.getElementById('productSlider');
+			const slidesEl = slider.querySelector('.slides');
+			const slides = Array.from(slidesEl.children);
+			const prevBtn = slider.querySelector('.prev');
+			const nextBtn = slider.querySelector('.next');
+			const dotsCt = slider.querySelector('.dots');
+			let index = 0, timer = null, autoplay = true, interval = 5000;
+
+			// create dots
+			slides.forEach((s,i)=>{
+				const d = document.createElement('button');
+				d.className = 'dot' + (i===0? ' active' : '');
+				d.setAttribute('aria-label', 'Go to slide ' + (i+1));
+				d.addEventListener('click', ()=> goTo(i));
+				dotsCt.appendChild(d);
+			});
+
+			const dots = Array.from(dotsCt.children);
+
+			function update(){
+				slidesEl.style.transform = 'translateX(' + (-index * 100) + '%)';
+				dots.forEach((d,i)=> d.classList.toggle('active', i===index));
+			}
+
+			function next(){ index = (index+1) % slides.length; update(); }
+			function prev(){ index = (index-1 + slides.length) % slides.length; update(); }
+			function goTo(i){ index = i % slides.length; update(); }
+
+			nextBtn.addEventListener('click', ()=>{ next(); resetTimer(); });
+			prevBtn.addEventListener('click', ()=>{ prev(); resetTimer(); });
+
+			// autoplay
+			function startTimer(){ if(!autoplay) return; timer = setInterval(next, interval); }
+			function resetTimer(){ clearInterval(timer); startTimer(); }
+
+			// swipe support
+			let startX = 0, moved = false;
+			slidesEl.addEventListener('touchstart', e=>{ startX = e.touches[0].clientX; moved = false; clearInterval(timer); });
+			slidesEl.addEventListener('touchmove', e=>{ moved = true; });
+			slidesEl.addEventListener('touchend', e=>{ if(!moved) return; const endX = e.changedTouches[0].clientX; if(endX - startX > 40) prev(); else if(startX - endX > 40) next(); resetTimer(); });
+
+			// keyboard support
+			slider.addEventListener('keydown', e=>{ if(e.key === 'ArrowLeft') prev(); if(e.key === 'ArrowRight') next(); });
+			slider.setAttribute('tabindex','0');
+
+			// init
+			update(); startTimer();
+		})();
+	// navbar toggle (from home.html)
+	(function(){
+		const btn = document.querySelector('.menu-toggle');
+		const nav = document.getElementById('primary-navigation');
+		if(!btn || !nav) return;
+		btn.addEventListener('click', ()=>{
+			const open = nav.classList.toggle('open');
+			btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+		});
+		nav.addEventListener('click', (e)=>{
+			if(e.target.tagName === 'A' && nav.classList.contains('open')){
+				nav.classList.remove('open');
+				btn.setAttribute('aria-expanded','false');
+			}
+		});
+	})();
+
+// unit and size sync
+(function(){
+	const sizeSelect = document.getElementById('sizeSelect');
+	const unitRadios = Array.from(document.querySelectorAll('input[name="unit"]'));
+
+	function populateKg(selectedIndex){
+		const max = 5;
+		sizeSelect.innerHTML = '';
+		for(let i=1;i<=max;i++){
+			const opt = document.createElement('option');
+			opt.value = i + 'kg';
+			opt.textContent = i + 'kg';
+			sizeSelect.appendChild(opt);
+		}
+		// restore selection if possible
+		if(typeof selectedIndex === 'number') sizeSelect.selectedIndex = Math.min(selectedIndex, max-1);
+	}
+
+	function populateLb(selectedIndex){
+		const max = 6;
+		sizeSelect.innerHTML = '';
+		for(let i=1;i<=max;i++){
+			const opt = document.createElement('option');
+			opt.value = i + 'lb';
+			opt.textContent = i + 'lb';
+			sizeSelect.appendChild(opt);
+		}
+		if(typeof selectedIndex === 'number') sizeSelect.selectedIndex = Math.min(selectedIndex, max-1);
+	}
+
+	// initial population (assume kg default)
+	populateKg(1); // default select ~2nd item
+
+	unitRadios.forEach(radio=>{
+		radio.addEventListener('change', ()=>{
+			if(!radio.checked) return;
+			const currentIndex = sizeSelect.selectedIndex >= 0 ? sizeSelect.selectedIndex : 0;
+			if(radio.value === 'kg') populateKg(currentIndex);
+			else populateLb(currentIndex);
+		});
+	});
+})();
+	</script>
+	</body>
+	</html>
+
+

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>GAINZ | The Arsenal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --accent: #ffd166; --bg-dark: #050505; }
+        body { background-color: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        #spotlight {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 209, 102, 0.06), transparent 80%);
+        }
+
+        .stage-container { perspective: 1200px; }
+        .img-wrap { transform-style: preserve-3d; transition: transform 0.2s ease-out; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(1deg); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        #product-title, #product-desc, #product-stats, #flavor-container, #main-image, #product-price {
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scramble-font { font-family: 'ui-monospace', monospace; }
+        
+        .nav-glass {
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .category-card { transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        .category-card.active {
+            border-color: #ffd166;
+            background: rgba(255, 209, 102, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .flavor-btn {
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 209, 102, 0.1);
+            cursor: pointer;
+        }
+        .flavor-btn.active {
+            background: #ffd166;
+            color: #000;
+            border-color: #ffd166;
+            box-shadow: 0 0 15px rgba(255, 209, 102, 0.3);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="spotlight"></div>
+
+    <header class="fixed top-0 left-0 right-0 z-50 nav-glass">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-black"><img src="logo.png" alt=""></div>
+                <span class="font-black text-xl tracking-tighter uppercase">Gainz</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <span class="text-[10px] font-black tracking-widest text-gray-400 uppercase">Cart (0)</span>
+                <button class="bg-white text-black text-[10px] font-black px-4 py-2 rounded-full uppercase">Menu</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="min-h-screen flex flex-col justify-center pt-20 relative z-10">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
+            
+            <div class="order-2 lg:order-1 space-y-8">
+                <div>
+                    <div class="flex items-center gap-4 mb-2">
+                        <span id="product-cat-label" class="text-amber-400 font-bold tracking-[0.5em] text-[10px] uppercase block">Performance Series</span>
+                        <span id="product-price" class="text-white font-black text-xl">$0.00</span>
+                    </div>
+                    <h1 id="product-title" class="text-6xl md:text-7xl font-black leading-none scramble-font mb-6 uppercase" data-value="WHEY ISOLATE">WHEY ISOLATE</h1>
+                    <p id="product-desc" class="text-gray-400 text-lg max-w-md leading-relaxed">
+                        Precision-engineered whey isolate for maximum muscle synthesis and rapid recovery.
+                    </p>
+                    
+                    <div id="flavor-container" class="mt-8 flex flex-wrap gap-3"></div>
+                </div>
+
+                <div id="product-stats" class="grid grid-cols-3 gap-8 py-8 border-y border-white/5"></div>
+
+                <div class="flex gap-4">
+                    <button class="bg-amber-400 text-black px-8 py-4 rounded-xl font-black uppercase text-sm hover:scale-105 transition-transform">Add to Stack</button>
+                    <button class="border border-white/10 px-8 py-4 rounded-xl font-black uppercase text-sm hover:bg-white/5 transition-all">Lab Report</button>
+                </div>
+            </div>
+
+            <div class="order-1 lg:order-2 stage-container flex items-center justify-center">
+                <div class="img-wrap animate-float relative" id="stage">
+                    <div class="absolute inset-0 bg-amber-400/20 blur-[120px] rounded-full"></div>
+                    <img id="main-image" src="" alt="Product" class="relative z-10 max-h-[550px] object-contain drop-shadow-[0_35px_60px_rgba(0,0,0,0.8)]">
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 w-full mt-12 pb-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div onclick="updateProduct('protein')" class="category-card active p-4 border border-white/5 rounded-2xl cursor-pointer" data-id="protein">
+                    <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">01. Protein</span>
+                    <h3 class="font-black text-sm uppercase">Whey Isolate</h3>
+                </div>
+                <div onclick="updateProduct('preworkout')" class="category-card p-4 border border-white/5 rounded-2xl cursor-pointer" data-id="preworkout">
+                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">02. Energy</span>
+                    <h3 class="font-black text-sm uppercase">Pre-Workout</h3>
+                </div>
+                <div onclick="updateProduct('creatine')" class="category-card p-4 border border-white/5 rounded-2xl cursor-pointer" data-id="creatine">
+                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">03. Power</span>
+                    <h3 class="font-black text-sm uppercase">Creatine</h3>
+                </div>
+                <div onclick="updateProduct('omegas')" class="category-card p-4 border border-white/5 rounded-2xl cursor-pointer" data-id="omegas">
+                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">04. Health</span>
+                    <h3 class="font-black text-sm uppercase">Omegas</h3>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const products = {
+            protein: {
+                title: "WHEY ISOLATE",
+                cat: "Performance Series",
+                basePrice: 54.99,
+                desc: "Triple-filtered whey isolate delivering 24g of pure protein with zero fillers or bloating.",
+                stats: [{v:"24g", l:"Protein"}, {v:"0g", l:"Sugar"}, {v:"5.5g", l:"BCAA"}],
+                flavors: [
+                    { name: "Vanilla Pro", img: "cutout2.png" },
+                    { name: "Mango Smoothie", img: "cutout1.png" },
+                    { name: "Kesar-Pista", img: "cutout3.png" }
+                ]
+            },
+            preworkout: {
+                title: "VOLTAGE PRE",
+                cat: "Focus Series",
+                basePrice: 44.99,
+                desc: "High-stimulant pre-workout designed for skin-splitting pumps and laser-like mental clarity.",
+                stats: [{v:"350mg", l:"Caffeine"}, {v:"6g", l:"Citrulline"}, {v:"3.2g", l:"Beta-Al"}],
+                flavors: [
+                    { name: "Blue Raspberry", img: "precutout.png" },
+                    { name: "Fruit Punch", img: "cutoutfruit.png" }
+                ]
+            },
+            creatine: {
+                title: "CREATINE MAX",
+                cat: "Strength Series",
+                basePrice: 29.99,
+                desc: "Micronized creatine monohydrate to increase ATP production and muscle explosive power.",
+                stats: [{v:"5g", l:"Creatine"}, {v:"100%", l:"Pure"}, {v:"80", l:"Servings"}],
+                flavors: [
+                    { name: "Unflavored", img: "cutoutunflavored.png" },
+                    { name: "Lemon", img: "cutoutlemon.png" },
+                    { name: "Blueberry", img: "creatinecutout.png" }
+                ]
+            },
+            omegas: {
+                title: "OMEGA ELITE",
+                cat: "Longevity Series",
+                basePrice: 19.99,
+                desc: "Premium fish oil concentrate for joint lubrication, heart health, and cognitive function.",
+                stats: [{v:"1200mg", l:"Omega-3"}, {v:"800mg", l:"EPA"}, {v:"600mg", l:"DHA"}],
+                img: "vitamincutout.png"
+            }
+        };
+
+        function updateProduct(key) {
+            const data = products[key];
+            
+            document.querySelectorAll('.category-card').forEach(c => {
+                c.classList.remove('active');
+                c.querySelector('span').classList.replace('text-amber-400', 'text-gray-500');
+            });
+            const activeCard = document.querySelector(`[data-id="${key}"]`);
+            activeCard.classList.add('active');
+            activeCard.querySelector('span').classList.replace('text-gray-500', 'text-amber-400');
+
+            const content = [
+                document.getElementById('product-title'), 
+                document.getElementById('product-desc'), 
+                document.getElementById('product-stats'), 
+                document.getElementById('main-image'),
+                document.getElementById('flavor-container'),
+                document.getElementById('product-price')
+            ];
+            
+            content.forEach(el => { el.style.opacity = '0'; el.style.transform = 'translateY(10px)'; });
+
+            setTimeout(() => {
+                document.getElementById('product-cat-label').innerText = data.cat;
+                document.getElementById('product-title').innerText = data.title;
+                document.getElementById('product-title').dataset.value = data.title;
+                document.getElementById('product-desc').innerText = data.desc;
+                document.getElementById('product-price').innerText = `$${data.basePrice.toFixed(2)}`;
+
+                const defaultImg = data.flavors ? data.flavors[0].img : data.img;
+                document.getElementById('main-image').src = defaultImg;
+
+                const flavorContainer = document.getElementById('flavor-container');
+                if (data.flavors) {
+                    flavorContainer.innerHTML = `<span class="w-full text-[9px] uppercase tracking-widest text-gray-500 font-black mb-1">Select Flavor</span>` + 
+                        data.flavors.map((f, i) => `
+                        <button class="flavor-btn px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider ${i===0 ? 'active' : ''}" 
+                                onclick="changeFlavor(this, '${f.img}')">
+                            ${f.name}
+                        </button>
+                    `).join('');
+                } else {
+                    flavorContainer.innerHTML = '';
+                }
+
+                const statsHTML = data.stats.map(s => `
+                    <div>
+                        <div class="text-2xl font-black">${s.v}</div>
+                        <div class="text-[9px] uppercase tracking-widest text-gray-500 font-bold">${s.l}</div>
+                    </div>
+                `).join('');
+                document.getElementById('product-stats').innerHTML = statsHTML;
+
+                content.forEach(el => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
+                runScramble(document.getElementById('product-title'));
+            }, 300);
+        }
+
+        function changeFlavor(btn, imgSrc) {
+            const imgEl = document.getElementById('main-image');
+            document.querySelectorAll('.flavor-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            imgEl.style.opacity = '0';
+            imgEl.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                imgEl.src = imgSrc;
+                imgEl.style.opacity = '1';
+                imgEl.style.transform = 'scale(1)';
+            }, 250);
+        }
+
+        function runScramble(el) {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+            const goal = el.dataset.value;
+            let count = 0;
+            const timer = setInterval(() => {
+                el.innerText = goal.split("").map((letter, i) => {
+                    if(i < count) return goal[i];
+                    return letter === " " ? " " : chars[Math.floor(Math.random() * chars.length)];
+                }).join("");
+                if(count >= goal.length) clearInterval(timer);
+                count += 1/3;
+            }, 30);
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            document.getElementById('spotlight').style.setProperty('--mouse-x', `${e.clientX}px`);
+            document.getElementById('spotlight').style.setProperty('--mouse-y', `${e.clientY}px`);
+            const moveX = (e.clientX - window.innerWidth/2) / 50;
+            const moveY = (e.clientY - window.innerHeight/2) / 50;
+            document.getElementById('stage').style.transform = `rotateY(${moveX}deg) rotateX(${-moveY}deg)`;
+        });
+
+        window.onload = () => updateProduct('protein');
+    </script>
+</body>
+</html>
