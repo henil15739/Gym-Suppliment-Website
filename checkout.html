@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>GAINZ | Deployment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function(){
+            // Replace with your actual Public Key from EmailJS Account Settings
+            emailjs.init("JT5UgqiJ2zQONbcXO"); 
+        })();
+    </script>
+    <style>
+        :root { --accent: #ffd166; --bg-dark: #050505; }
+        body { background-color: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .input-field {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #ffd166;
+            background: rgba(255, 209, 102, 0.05);
+            outline: none;
+        }
+        .scramble-font { font-family: 'ui-monospace', monospace; }
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+
+    <header class="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="home.html" class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg border border-amber-400/30 flex items-center justify-center text-amber-400 font-black">G</div>
+                <span class="font-black text-2xl tracking-tighter uppercase">Gainz</span>
+            </a>
+            <a href="cart.html" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-white">Return to Arsenal</a>
+        </div>
+    </header>
+
+    <main class="pt-32 pb-20 px-6">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl font-black mb-10 scramble-font tracking-tighter uppercase">Checkout // Secure_Deployment</h1>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="space-y-8">
+                    <section>
+                        <h2 class="text-amber-400 font-black text-xs uppercase tracking-[0.3em] mb-6">01. Shipping Information</h2>
+                        <form id="checkout-form" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="text" placeholder="First Name" required class="input-field w-full p-4 rounded-xl text-sm">
+                                <input type="text" placeholder="Last Name" required class="input-field w-full p-4 rounded-xl text-sm">
+                            </div>
+                            <input type="email" placeholder="Email Address" required class="input-field w-full p-4 rounded-xl text-sm">
+                            <input type="tel" placeholder="Phone Number" required class="input-field w-full p-4 rounded-xl text-sm">
+                            <input type="text" placeholder="Full Street Address" required class="input-field w-full p-4 rounded-xl text-sm">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="text" placeholder="City" required class="input-field w-full p-4 rounded-xl text-sm">
+                                <input type="text" placeholder="PIN Code" required class="input-field w-full p-4 rounded-xl text-sm">
+                            </div>
+                        </form>
+                    </section>
+
+                    <section>
+                        <h2 class="text-amber-400 font-black text-xs uppercase tracking-[0.3em] mb-6">02. Payment Method</h2>
+                        <div class="glass p-6 rounded-2xl border-amber-400/50 flex items-center justify-between border">
+                            <div class="flex items-center gap-4">
+                                <div class="w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center">
+                                    <div class="w-2 h-2 bg-black rounded-full"></div>
+                                </div>
+                                <div>
+                                    <p class="font-black uppercase text-sm">Cash On Delivery (COD)</p>
+                                    <p class="text-[10px] text-gray-500 font-bold uppercase">Pay when your fuel arrives</p>
+                                </div>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="lg:col-span-1">
+                    <div class="glass p-8 rounded-3xl sticky top-32 border-white/10">
+                        <h2 class="font-black uppercase text-xl mb-6 tracking-tight">Order Summary</h2>
+                        <div id="summary-items" class="space-y-4 mb-6 max-h-60 overflow-y-auto pr-2"></div>
+
+                        <div class="space-y-3 py-6 border-y border-white/5 mb-6 text-sm">
+                            <div class="flex justify-between text-gray-400">
+                                <span>Subtotal</span>
+                                <span class="text-white" id="checkout-subtotal">₹0</span>
+                            </div>
+                            <div class="flex justify-between text-gray-400">
+                                <span>Shipping</span>
+                                <span class="text-green-400 font-black uppercase text-[10px]">Free</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-end mb-8">
+                            <span class="text-xs font-bold uppercase text-gray-500">Total Payable</span>
+                            <span class="text-3xl font-black text-amber-400" id="checkout-total">₹0</span>
+                        </div>
+
+                        <button onclick="confirmOrder()" class="w-full bg-amber-400 text-black py-5 rounded-2xl font-black uppercase tracking-tighter hover:shadow-[0_0_40px_rgba(255,209,102,0.3)] transition-all">
+                            Confirm Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    function loadSummary() {
+        const cart = JSON.parse(localStorage.getItem('gainz_cart')) || [];
+        const container = document.getElementById('summary-items');
+        let total = 0;
+
+        if (cart.length === 0) {
+            window.location.href = 'product.html';
+            return 0;
+        }
+
+        container.innerHTML = cart.map(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            return `
+                <div class="flex justify-between items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <img src="${item.image}" class="w-12 h-12 object-cover rounded-lg border border-white/10">
+                            <span class="absolute -top-2 -right-2 bg-amber-400 text-black text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full">${item.quantity}</span>
+                        </div>
+                        <span class="text-xs font-bold uppercase text-gray-300 truncate w-32">${item.name}</span>
+                    </div>
+                    <span class="text-xs font-black">₹${itemTotal.toLocaleString('en-IN')}</span>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('checkout-subtotal').innerText = `₹${total.toLocaleString('en-IN')}`;
+        document.getElementById('checkout-total').innerText = `₹${total.toLocaleString('en-IN')}`;
+        return total;
+    }
+
+    async function confirmOrder() {
+        const form = document.getElementById('checkout-form');
+        if (!form.checkValidity()) {
+            alert("Please complete the shipping mission parameters.");
+            return;
+        }
+
+        const totalAmount = loadSummary(); 
+        const inputs = form.getElementsByTagName('input');
+
+        const orderPayload = {
+            first_name: inputs[0].value,
+            last_name: inputs[1].value,
+            email: inputs[2].value,
+            phone: inputs[3].value,
+            address: inputs[4].value,
+            city: inputs[5].value,
+            pin_code: inputs[6].value,
+            total_amount: totalAmount
+        };
+
+        try {
+            // STEP 1: Deploy to MySQL via Python
+            const response = await fetch('http://127.0.0.1:5000/deploy-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderPayload)
+            });
+
+            if (response.ok) {
+                // STEP 2: Trigger EmailJS Confirmation
+                const emailParams = {
+                    first_name: orderPayload.first_name,
+                    user_email: orderPayload.email,
+                    total_amount: "₹" + totalAmount.toLocaleString('en-IN'),
+                    order_id: "GAZ-" + Math.floor(100000 + Math.random() * 900000)
+                };
+
+                emailjs.send("service_esm0slv", "template_w49i0t9", emailParams)
+                    .then(() => {
+                        console.log("Email Dispatched.");
+                        renderSuccessUI();
+                        localStorage.removeItem('gainz_cart');
+                    }, (error) => {
+                        console.error("Email Blocked:", error);
+                        // Still show success as DB is updated
+                        renderSuccessUI();
+                    });
+            } else {
+                alert("Database Sync Failed. Check Backend.");
+            }
+        } catch (error) {
+            console.error("Network Error:", error);
+            alert("Backend Offline. Ensure Python app.py is running.");
+        }
+    }
+
+    function renderSuccessUI() {
+        document.body.innerHTML = `
+            <div class="min-h-screen flex flex-col items-center justify-center text-center p-6">
+                <div class="w-20 h-20 bg-amber-400 rounded-full flex items-center justify-center mb-8 animate-bounce">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h1 class="text-5xl font-black uppercase scramble-font mb-4">Order_Deployed</h1>
+                <p class="text-gray-400 max-w-md uppercase text-xs tracking-widest leading-loose">
+                    Your details are synced and a confirmation email is on its way. Stand by for fuel arrival.
+                </p>
+                <a href="index.html" class="mt-12 px-8 py-4 border border-white/10 rounded-full font-black uppercase text-[10px] hover:bg-white/5">Back to Base</a>
+            </div>
+        `;
+    }
+
+    window.onload = loadSummary;
+</script>
+</body>
+</html>

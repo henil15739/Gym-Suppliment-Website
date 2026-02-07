@@ -61,11 +61,15 @@
     <header class="fixed top-0 left-0 right-0 z-50 nav-glass">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-black"><img src="logo.png" alt=""></div>
+                <div class="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-black">
+                    <img src="logo.png" alt="" onerror="this.style.display='none'">G
+                </div>
                 <span class="font-black text-xl tracking-tighter uppercase">Gainz</span>
             </div>
             <div class="flex items-center gap-6">
-                <span class="text-[10px] font-black tracking-widest text-gray-400 uppercase">Cart (0)</span>
+                <a href="cart.html" class="text-[10px] font-black tracking-widest text-gray-400 uppercase hover:text-amber-400 transition-colors">
+                    Cart (<span id="cart-count">0</span>)
+                </a>
                 <button class="bg-white text-black text-[10px] font-black px-4 py-2 rounded-full uppercase">Menu</button>
             </div>
         </div>
@@ -91,7 +95,9 @@
                 <div id="product-stats" class="grid grid-cols-3 gap-8 py-8 border-y border-white/5"></div>
 
                 <div class="flex gap-4">
-                    <button class="bg-amber-400 text-black px-8 py-4 rounded-xl font-black uppercase text-sm hover:scale-105 transition-transform">Add to Stack</button>
+                    <button id="add-to-cart-btn" onclick="addToStack()" class="bg-amber-400 text-black px-8 py-4 rounded-xl font-black uppercase text-sm hover:scale-105 transition-transform active:scale-95">
+                        Add to Stack
+                    </button>
                     <button class="border border-white/10 px-8 py-4 rounded-xl font-black uppercase text-sm hover:bg-white/5 transition-all">Lab Report</button>
                 </div>
             </div>
@@ -173,7 +179,48 @@
             }
         };
 
+        let currentActiveKey = 'protein';
+        let currentActiveFlavorName = "";
+
+        // --- CART LOGIC START ---
+        function updateCartBadge() {
+            const cart = JSON.parse(localStorage.getItem('gainz_cart')) || [];
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            document.getElementById('cart-count').innerText = count;
+        }
+
+        function addToStack() {
+            const data = products[currentActiveKey];
+            const name = currentActiveFlavorName ? `${data.title} (${currentActiveFlavorName})` : data.title;
+            const price = data.basePrice;
+            const image = document.getElementById('main-image').src;
+
+            let cart = JSON.parse(localStorage.getItem('gainz_cart')) || [];
+            const existingItem = cart.find(item => item.name === name);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ name, price, image, quantity: 1 });
+            }
+
+            localStorage.setItem('gainz_cart', JSON.stringify(cart));
+            updateCartBadge();
+
+            // Button Feedback
+            const btn = document.getElementById('add-to-cart-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "STACKED!";
+            btn.classList.replace('bg-amber-400', 'bg-white');
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.replace('bg-white', 'bg-amber-400');
+            }, 1000);
+        }
+        // --- CART LOGIC END ---
+
         function updateProduct(key) {
+            currentActiveKey = key;
             const data = products[key];
             
             document.querySelectorAll('.category-card').forEach(c => {
@@ -203,6 +250,7 @@
                 document.getElementById('product-price').innerText = `$${data.basePrice.toFixed(2)}`;
 
                 const defaultImg = data.flavors ? data.flavors[0].img : data.img;
+                currentActiveFlavorName = data.flavors ? data.flavors[0].name : "";
                 document.getElementById('main-image').src = defaultImg;
 
                 const flavorContainer = document.getElementById('flavor-container');
@@ -210,12 +258,13 @@
                     flavorContainer.innerHTML = `<span class="w-full text-[9px] uppercase tracking-widest text-gray-500 font-black mb-1">Select Flavor</span>` + 
                         data.flavors.map((f, i) => `
                         <button class="flavor-btn px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider ${i===0 ? 'active' : ''}" 
-                                onclick="changeFlavor(this, '${f.img}')">
+                                onclick="changeFlavor(this, '${f.img}', '${f.name}')">
                             ${f.name}
                         </button>
                     `).join('');
                 } else {
                     flavorContainer.innerHTML = '';
+                    currentActiveFlavorName = "";
                 }
 
                 const statsHTML = data.stats.map(s => `
@@ -231,7 +280,8 @@
             }, 300);
         }
 
-        function changeFlavor(btn, imgSrc) {
+        function changeFlavor(btn, imgSrc, flavorName) {
+            currentActiveFlavorName = flavorName;
             const imgEl = document.getElementById('main-image');
             document.querySelectorAll('.flavor-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -265,10 +315,14 @@
             document.getElementById('spotlight').style.setProperty('--mouse-y', `${e.clientY}px`);
             const moveX = (e.clientX - window.innerWidth/2) / 50;
             const moveY = (e.clientY - window.innerHeight/2) / 50;
-            document.getElementById('stage').style.transform = `rotateY(${moveX}deg) rotateX(${-moveY}deg)`;
+            const stage = document.getElementById('stage');
+            if(stage) stage.style.transform = `rotateY(${moveX}deg) rotateX(${-moveY}deg)`;
         });
 
-        window.onload = () => updateProduct('protein');
+        window.onload = () => {
+            updateProduct('protein');
+            updateCartBadge();
+        };
     </script>
 </body>
 </html>

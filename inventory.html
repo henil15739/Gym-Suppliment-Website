@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>GAINZ | Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --accent: #ffd166; --bg-dark: #050505; --admin-red: #ff4444; }
+        body { background-color: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        #spotlight {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 68, 68, 0.04), transparent 80%);
+        }
+        .glass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .tag-low { background: rgba(255, 68, 68, 0.1); color: #ff4444; border: 1px solid rgba(255, 68, 68, 0.2); }
+        .tag-optimal { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.2); }
+        .tag-critical { background: rgba(255, 0, 0, 0.2); color: #ff0000; border: 1px solid #ff0000; box-shadow: 0 0 10px rgba(255,0,0,0.5); }
+        
+        /* Custom scrollbar for a cleaner dashboard look */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="spotlight"></div>
+
+    <div id="addModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-md">
+        <div class="glass-card p-10 rounded-[2.5rem] w-full max-w-md border-red-600/30">
+            <h2 class="text-2xl font-black italic uppercase mb-6">Initialize <span class="text-red-600">Compound</span></h2>
+            <div class="space-y-4">
+                <input type="text" id="newName" placeholder="Product & Flavor" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-red-500 outline-none text-white">
+                <input type="text" id="newSku" placeholder="SKU ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-red-500 outline-none text-white">
+                <div class="flex gap-4">
+                    <input type="number" id="newStock" placeholder="Stock" class="w-1/2 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-red-500 outline-none text-white">
+                    <input type="number" id="newLimit" placeholder="Limit" class="w-1/2 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-red-500 outline-none text-white">
+                </div>
+                <input type="text" id="newBatch" placeholder="Batch ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-red-500 outline-none text-white">
+            </div>
+            <div class="flex gap-4 mt-8">
+                <button onclick="toggleModal()" class="flex-1 text-gray-500 text-[10px] font-black uppercase tracking-widest">Abort</button>
+                <button onclick="commitCompound()" class="flex-1 bg-red-600 text-black py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-500">Commit</button>
+            </div>
+        </div>
+    </div>
+
+    <aside class="fixed left-0 top-0 h-screen w-64 border-r border-white/5 p-8 flex flex-col z-20 bg-black/50">
+        <div class="flex items-center gap-3 mb-12">
+            <div class="w-8 h-8 bg-red-600 rounded flex items-center justify-center text-black font-black">G</div>
+            <span class="font-black text-xl tracking-tighter uppercase">Gainz <span class="text-red-600">Admin</span></span>
+        </div>
+        <nav class="space-y-6 flex-1">
+            <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Main Systems</div>
+            <a href="admin.html" class="block text-red-500 font-bold text-sm tracking-tight italic underline">01. DASHBOARD</a>
+            <a href="inventory.html" class="block text-gray-400 hover:text-red-500 transition-all text-sm tracking-tight">02. INVENTORY</a>
+            <a href="#" class="block text-gray-400 hover:text-red-500 transition-all text-sm tracking-tight">03. LOGISTICS</a>
+            <a href="#" class="block text-gray-400 hover:text-red-500 transition-all text-sm tracking-tight">04. SETTINGS</a>
+        </nav>
+        <div class="pt-6 border-t border-white/5">
+            <p class="text-[9px] text-gray-600 uppercase">System Status: <span class="text-green-500">Online</span></p>
+        </div>
+    </aside>
+
+    <main class="ml-64 p-12 h-screen overflow-y-auto relative z-10">
+        <header class="flex justify-between items-start mb-8">
+            <div>
+                <h1 class="text-4xl font-black uppercase tracking-tighter italic">Command <span class="text-red-600">Center</span></h1>
+                <p class="text-gray-500 text-xs mt-2 uppercase tracking-[0.3em]">Operational Overview & Telemetry</p>
+            </div>
+            <button onclick="toggleModal()" class="bg-red-600 text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-transform">
+                + New Entry
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="glass-card p-6 rounded-3xl border-l-4 border-l-red-600">
+                <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Total Compounds</p>
+                <p class="text-3xl font-black mt-2" id="stat-total">--</p>
+            </div>
+            <div class="glass-card p-6 rounded-3xl border-l-4 border-l-amber-500">
+                <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Low Stock Alerts</p>
+                <p class="text-3xl font-black mt-2 text-amber-500" id="stat-low">--</p>
+            </div>
+            <div class="glass-card p-6 rounded-3xl border-l-4 border-l-green-500">
+                <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Active Batches</p>
+                <p class="text-3xl font-black mt-2 text-green-500" id="stat-batches">--</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div class="xl:col-span-2">
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <h3 class="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
+                        Live Inventory Snapshot
+                    </h3>
+                    <table class="w-full text-left">
+                        <thead class="text-[10px] text-gray-600 uppercase tracking-widest font-black border-b border-white/5">
+                            <tr>
+                                <th class="pb-4">Compound</th>
+                                <th class="pb-4">Level</th>
+                                <th class="pb-4">Batch</th>
+                                <th class="pb-4 text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryBody" class="text-sm">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="xl:col-span-1">
+                <div class="glass-card rounded-[2.5rem] p-8 h-full">
+                    <h3 class="text-sm font-black uppercase tracking-widest mb-6">System Log</h3>
+                    <div id="activityLog" class="space-y-4 text-[11px] font-mono text-gray-400">
+                        <div class="border-l border-red-600 pl-3">
+                            <span class="text-red-600">[09:41]</span> ADMIN_LOGIN: Successful override from local.
+                        </div>
+                        <div class="border-l border-gray-700 pl-3">
+                            <span class="text-gray-600">[09:42]</span> DB_SYNC: Connected to inventory_vault.
+                        </div>
+                        <div class="border-l border-amber-600 pl-3">
+                            <span class="text-amber-600">[09:45]</span> ALERT: SKU_WHEY_CHOCO below safety limit.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Mouse Spotlight interaction
+        window.addEventListener('mousemove', (e) => {
+            document.getElementById('spotlight').style.setProperty('--mouse-x', `${e.clientX}px`);
+            document.getElementById('spotlight').style.setProperty('--mouse-y', `${e.clientY}px`);
+        });
+
+        function toggleModal() { document.getElementById('addModal').classList.toggle('hidden'); }
+
+        async function loadInventory() {
+            try {
+                const res = await fetch('http://127.0.0.1:5000/api/inventory');
+                const data = await res.json();
+                
+                // Update Stats
+                document.getElementById('stat-total').innerText = data.length;
+                document.getElementById('stat-low').innerText = data.filter(i => i.status !== 'Optimal').length;
+                document.getElementById('stat-batches').innerText = new Set(data.map(i => i.batch_id)).size;
+
+                const body = document.getElementById('inventoryBody');
+                body.innerHTML = '';
+
+                data.slice(0, 6).forEach(item => { // Limit to 6 for dashboard view
+                    const tagClass = item.status === 'Optimal' ? 'tag-optimal' : (item.status === 'Critical' ? 'tag-critical' : 'tag-low');
+                    body.innerHTML += `
+                        <tr class="border-b border-white/5 hover:bg-white/[0.01]">
+                            <td class="py-4">
+                                <div class="font-bold uppercase text-xs">${item.product_name}</div>
+                                <div class="text-[9px] text-gray-600 uppercase">${item.sku}</div>
+                            </td>
+                            <td class="py-4 text-xs font-mono">${item.stock_level}</td>
+                            <td class="py-4 text-[10px] text-gray-500">#${item.batch_id}</td>
+                            <td class="py-4 text-right">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-black ${tagClass}">${item.status}</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error("Failed to load telemetry:", err);
+            }
+        }
+
+        async function commitCompound() {
+    const payload = {
+        name: document.getElementById('newName').value,
+        sku: document.getElementById('newSku').value,
+        stock: parseInt(document.getElementById('newStock').value),
+        limit: parseInt(document.getElementById('newLimit').value),
+        // This MUST match data.get('batch_id') in Python
+        batch_id: document.getElementById('newBatch').value 
+    };
+
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/inventory', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            alert("Compound Synchronized.");
+            location.reload();
+        } else {
+            const errorData = await response.json();
+            console.error("Server Error Details:", errorData);
+            alert("Error: " + errorData.details);
+        }
+    } catch (err) {
+        console.error("Connection Error:", err);
+    }
+}
+        window.onload = loadInventory;
+    </script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>GAINZ | Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --accent: #ffd166; --bg-dark: #050505; --admin-red: #ff4444; }
+        body { background-color: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; }
+
+        #spotlight {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 68, 68, 0.04), transparent 80%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover { border-color: var(--admin-red); background: rgba(255, 68, 68, 0.02); }
+
+        .status-pulse {
+            width: 8px; height: 8px; border-radius: 50%; background: #00ff88;
+            box-shadow: 0 0 10px #00ff88; animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="spotlight"></div>
+
+    <aside class="fixed left-0 top-0 h-screen w-64 border-r border-white/5 p-8 flex flex-col z-20 bg-black/50">
+        <div class="flex items-center gap-3 mb-12">
+            <div class="w-8 h-8 bg-red-600 rounded flex items-center justify-center text-black font-black">C</div>
+            <span class="font-black text-xl tracking-tighter uppercase">Command</span>
+        </div>
+
+        <nav class="space-y-6 flex-1">
+            <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Main Systems</div>
+            <a href="admin.html" class="block text-red-500 font-bold text-sm tracking-tight">01. OVERVIEW</a>
+            <a href="inventory.html" class="block text-gray-400 hover:text-white transition-colors text-sm tracking-tight">02. INVENTORY</a>
+            <a href="#" class="block text-gray-400 hover:text-white transition-colors text-sm tracking-tight">03. ATHLETE BASE</a>
+            <a href="#" class="block text-gray-400 hover:text-white transition-colors text-sm tracking-tight">04. LAB REPORTS</a>
+        </nav>
+
+        <button onclick="window.location.href='index.html'" class="text-[10px] font-black text-gray-600 hover:text-red-500 uppercase tracking-widest text-left">
+            Terminate Session
+        </button>
+    </aside>
+
+    <main class="ml-64 p-12 h-screen overflow-y-auto relative z-10">
+        <header class="flex justify-between items-end mb-12">
+            <div>
+                <h1 class="text-4xl font-black uppercase tracking-tighter italic">Systems <span class="text-red-600">Online</span></h1>
+                <p class="text-gray-500 text-xs mt-2 uppercase tracking-[0.3em]">Protocol Alpha-882 Initialized</p>
+            </div>
+            <div class="flex items-center gap-4 glass-card px-6 py-3 rounded-2xl">
+                <div class="status-pulse"></div>
+                <span class="text-[10px] font-black uppercase tracking-widest">Server: 127.0.0.1</span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div class="glass-card p-6 rounded-3xl">
+                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Total Revenue</p>
+                <h2 class="text-2xl font-black">$142,800.00</h2>
+                <div class="text-[10px] text-green-500 font-bold mt-2">+12% vs last cycle</div>
+            </div>
+            <div class="glass-card p-6 rounded-3xl">
+                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Active Athletes</p>
+                <h2 class="text-2xl font-black">1,240</h2>
+                <div class="text-[10px] text-red-500 font-bold mt-2">-2% latency delay</div>
+            </div>
+            <div class="glass-card p-6 rounded-3xl">
+                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Avg. Stack Value</p>
+                <h2 class="text-2xl font-black">$84.20</h2>
+                <div class="text-[10px] text-gray-500 font-bold mt-2">Optimized</div>
+            </div>
+            <div class="glass-card p-6 rounded-3xl">
+                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Units Shipped</p>
+                <h2 class="text-2xl font-black">4,502</h2>
+                <div class="text-[10px] text-amber-400 font-bold mt-2">Processing</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 glass-card rounded-[2.5rem] p-10">
+                <h3 class="text-lg font-black uppercase italic mb-8">Recent Protocols</h3>
+                <table class="w-full text-left">
+                    <thead class="text-[10px] text-gray-600 uppercase tracking-widest font-black border-b border-white/5">
+                        <tr>
+                            <th class="pb-4">Athlete ID</th>
+                            <th class="pb-4">Active Stack</th>
+                            <th class="pb-4">Status</th>
+                            <th class="pb-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="border-b border-white/5">
+                            <td class="py-6 font-bold uppercase">John Doe #102</td>
+                            <td class="py-6 text-gray-400">Whey Isolate + Pre</td>
+                            <td class="py-6 text-green-500">Completed</td>
+                            <td class="py-6 text-right"><button class="text-red-500 text-xs font-black uppercase">REVOKE</button></td>
+                        </tr>
+                        <tr class="border-b border-white/5">
+                            <td class="py-6 font-bold uppercase">Sarah Connor #88</td>
+                            <td class="py-6 text-gray-400">Full Power Stack</td>
+                            <td class="py-6 text-amber-400">Processing</td>
+                            <td class="py-6 text-right"><button class="text-red-500 text-xs font-black uppercase">REVOKE</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="glass-card rounded-[2.5rem] p-10">
+                <h3 class="text-lg font-black uppercase italic mb-8">Inventory Health</h3>
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex justify-between text-[10px] font-black uppercase mb-2">
+                            <span>Whey Isolate</span>
+                            <span class="text-red-500">Low Stock (12%)</span>
+                        </div>
+                        <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                            <div class="w-[12%] h-full bg-red-600"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] font-black uppercase mb-2">
+                            <span>Voltage Pre</span>
+                            <span>Optimal (82%)</span>
+                        </div>
+                        <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                            <div class="w-[82%] h-full bg-amber-400"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] font-black uppercase mb-2">
+                            <span>Creatine Max</span>
+                            <span>Critical (5%)</span>
+                        </div>
+                        <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                            <div class="w-[5%] h-full bg-red-600 shadow-[0_0_10px_red]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        window.addEventListener('mousemove', (e) => {
+            document.getElementById('spotlight').style.setProperty('--mouse-x', `${e.clientX}px`);
+            document.getElementById('spotlight').style.setProperty('--mouse-y', `${e.clientY}px`);
+        });
+    </script>
+</body>
+</html>

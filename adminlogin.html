@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>GAINZ | Admin Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { 
+            --admin-red: #ff4444;
+            --bg-dark: #050505; 
+        }
+        
+        body { 
+            background-color: var(--bg-dark); 
+            color: #fff; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden;
+        }
+
+        /* Dynamic Spotlight Effect */
+        #spotlight {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 68, 68, 0.08), transparent 80%);
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            box-shadow: 0 0 40px rgba(255, 68, 68, 0.05);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-field {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus { 
+            border-color: var(--admin-red); 
+            outline: none; 
+            box-shadow: 0 0 15px rgba(255, 68, 68, 0.1); 
+        }
+        
+        .scramble-font { font-family: 'ui-monospace', monospace; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+    </style>
+</head>
+<body class="antialiased flex items-center justify-center min-h-screen">
+    <div id="spotlight"></div>
+
+    <main class="relative z-10 w-full max-w-md px-6">
+        <div class="flex flex-col items-center mb-10">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center text-white font-black text-2xl shadow-[0_0_20px_rgba(255,68,68,0.4)]">A</div>
+                <span class="font-black text-3xl tracking-tighter uppercase">Gainz <span class="text-red-600">OS</span></span>
+            </div>
+            <span class="text-[10px] text-red-500 font-bold tracking-[0.4em] uppercase">Command Override Active</span>
+        </div>
+
+        <div class="auth-card p-8 rounded-3xl">
+            <h2 id="card-title" class="text-2xl font-black mb-6 scramble-font uppercase" data-value="SECURITY OVERRIDE">INITIALIZING...</h2>
+            
+            <form id="accessForm" class="space-y-4">
+                <div>
+                    <label class="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2 block">Administrator ID</label>
+                    <input type="text" id="mainId" autocomplete="off" required class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-600" placeholder="Enter Admin ID">
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2 block">Security Cipher</label>
+                    <input type="password" id="mainPass" required class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-600" placeholder="••••••••">
+                </div>
+                
+                <div class="pt-4">
+                    <button type="submit" id="actionBtn" class="w-full bg-red-600 text-white py-4 rounded-xl font-black uppercase tracking-widest transition-all duration-500 hover:bg-red-500">
+                        Authorize Override
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-8 text-center border-t border-white/5 pt-6">
+                <p class="text-gray-600 text-[9px] font-bold uppercase tracking-[0.2em]">
+                    Authorized Personnel Only — Unauthorized access is logged.
+                </p>
+            </div>
+        </div>
+    </main>
+
+<script>
+const ADMIN_CRED = { id: "Admin", pass: "Admin@001" };
+
+// --- UI ANIMATION: Text Scramble ---
+function runScramble(el) {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&@$";
+    const goal = el.dataset.value;
+    let count = 0;
+    const timer = setInterval(() => {
+        el.innerText = goal.split("").map((letter, i) => {
+            if(i < count) return goal[i];
+            if(letter === " ") return " ";
+            return chars[Math.floor(Math.random() * chars.length)];
+        }).join("");
+        if(count >= goal.length) clearInterval(timer);
+        count += 1/3;
+    }, 30);
+}
+
+// --- AUTHENTICATION LOGIC ---
+document.getElementById('accessForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('actionBtn');
+    const form = document.getElementById('accessForm');
+    const idInput = document.getElementById('mainId').value;
+    const passInput = document.getElementById('mainPass').value;
+
+    if (idInput === ADMIN_CRED.id && passInput === ADMIN_CRED.pass) {
+        btn.innerText = "ACCESS GRANTED";
+        btn.className = "w-full bg-emerald-500 text-white py-4 rounded-xl font-black uppercase tracking-widest shadow-[0_0_20px_rgba(16,185,129,0.4)]";
+        setTimeout(() => {
+            alert("System Unlocked. Welcome, Admin.");
+            window.location.href = "admin.html"; 
+        }, 500);
+    } else {
+        btn.innerText = "DENIED";
+        form.classList.add('animate-shake');
+        setTimeout(() => { 
+            btn.innerText = "Authorize Override"; 
+            form.classList.remove('animate-shake');
+        }, 1500);
+    }
+});
+
+// --- VISUAL INTERACTIVITY ---
+window.addEventListener('mousemove', (e) => {
+    document.getElementById('spotlight').style.setProperty('--mouse-x', `${e.clientX}px`);
+    document.getElementById('spotlight').style.setProperty('--mouse-y', `${e.clientY}px`);
+});
+
+document.addEventListener('DOMContentLoaded', () => runScramble(document.getElementById('card-title')));
+</script>
+</body>
+</html>

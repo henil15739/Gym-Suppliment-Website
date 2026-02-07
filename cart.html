@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>GAINZ | Your Arsenal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --accent: #ffd166;
+            --bg-dark: #050505;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .scramble-font { font-family: 'ui-monospace', monospace; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+
+    <header class="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg border border-amber-400/30 flex items-center justify-center text-amber-400 font-black">G</div>
+                <div class="flex flex-col">
+                    <span class="font-black text-2xl tracking-tighter uppercase leading-none">Gainz</span>
+                    <span class="text-[10px] text-amber-400 font-bold tracking-[0.4em] uppercase">Engineered</span>
+                </div>
+            </a>
+            <nav class="flex gap-8 text-[11px] font-black uppercase tracking-widest text-gray-400 items-center">
+                <a href="product.html" class="hover:text-amber-400 transition-colors">Back to Shop</a>
+            </nav>
+        </div>
+    </header>
+<main class="pt-32 pb-20 px-6">
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-4xl font-black mb-10 scramble-font tracking-tighter">
+            YOUR_CART // <span class="text-amber-400" id="cart-count">0</span> ITEMS
+        </h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <div class="lg:col-span-2 space-y-4" id="cart-items-container">
+                </div>
+
+            <div class="lg:col-span-1">
+                <div class="glass p-8 rounded-3xl sticky top-32">
+                    <h2 class="font-black uppercase text-xl mb-6">Summary</h2>
+                    <div class="flex justify-between mb-8">
+                        <span class="text-xs font-bold text-gray-500 uppercase">Total</span>
+                        <span class="text-3xl font-black text-amber-400">₹<span id="final-total">0</span></span>
+                    </div>
+                    <button onclick="window.location.href='checkout.html'" class="w-full bg-amber-400 text-black py-5 rounded-2xl font-black uppercase">Checkout</button>
+                    <button onclick="clearCart()" class="w-full mt-4 text-[10px] text-gray-500 font-bold uppercase hover:text-white">Clear All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    function renderCart() {
+        const container = document.getElementById('cart-items-container');
+        const cart = JSON.parse(localStorage.getItem('gainz_cart')) || [];
+        let total = 0;
+
+        if (cart.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-20 glass rounded-3xl">
+                    <p class="text-gray-500 font-bold uppercase tracking-widest">Your arsenal is empty.</p>
+                    <a href="product.html" class="text-amber-400 font-black uppercase text-xs mt-4 inline-block underline">Go Shop</a>
+                </div>`;
+            document.getElementById('final-total').innerText = "0";
+            document.getElementById('cart-count').innerText = "0";
+            return;
+        }
+
+        container.innerHTML = cart.map((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            return `
+            <div class="glass p-6 rounded-2xl flex items-center gap-6">
+                <img src="${item.image}" class="w-20 h-24 object-cover rounded-lg border border-white/10">
+                <div class="flex-grow">
+                    <h3 class="font-black uppercase text-lg">${item.name}</h3>
+                    <div class="flex items-center gap-4 mt-4">
+                        <div class="flex items-center border border-white/10 rounded-full px-3 py-1">
+                            <button onclick="changeQty(${index}, -1)" class="hover:text-amber-400 px-2">-</button>
+                            <span class="w-8 text-center text-sm font-bold">${item.quantity}</span>
+                            <button onclick="changeQty(${index}, 1)" class="hover:text-amber-400 px-2">+</button>
+                        </div>
+                        <button onclick="removeItem(${index})" class="text-[10px] font-bold text-gray-500 hover:text-red-500">Remove</button>
+                    </div>
+                </div>
+                <div class="text-right font-black text-xl">₹${itemTotal.toLocaleString('en-IN')}</div>
+            </div>`;
+        }).join('');
+
+        document.getElementById('final-total').innerText = total.toLocaleString('en-IN');
+        document.getElementById('cart-count').innerText = cart.length;
+    }
+
+    function changeQty(index, delta) {
+        let cart = JSON.parse(localStorage.getItem('gainz_cart'));
+        cart[index].quantity += delta;
+        if (cart[index].quantity < 1) cart[index].quantity = 1;
+        localStorage.setItem('gainz_cart', JSON.stringify(cart));
+        renderCart();
+    }
+
+    function removeItem(index) {
+        let cart = JSON.parse(localStorage.getItem('gainz_cart'));
+        cart.splice(index, 1);
+        localStorage.setItem('gainz_cart', JSON.stringify(cart));
+        renderCart();
+    }
+
+    function clearCart() {
+        localStorage.removeItem('gainz_cart');
+        renderCart();
+    }
+
+    window.addEventListener('DOMContentLoaded', renderCart);
+</script>
+</body>
+</html>

@@ -10,7 +10,7 @@
             --accent: #ffd166;
             --bg-dark: #050505;
         }
- 
+
         body {
             background-color: var(--bg-dark);
             color: #fff;
@@ -29,10 +29,7 @@
         }
 
         /* 3D Stage */
-        .stage-container {
-            perspective: 1500px;
-        }
-
+        .stage-container { perspective: 1500px; }
         .img-wrap {
             transform-style: preserve-3d;
             transition: transform 0.2s ease-out;
@@ -44,9 +41,7 @@
             50% { transform: translateY(-20px) rotate(1deg); }
         }
 
-        .animate-float {
-            animation: float 8s ease-in-out infinite;
-        }
+        .animate-float { animation: float 8s ease-in-out infinite; }
 
         .fade-up {
             opacity: 0;
@@ -59,17 +54,13 @@
             transform: translateY(0);
         }
 
-        .scramble-font {
-            font-family: 'ui-monospace', monospace;
-        }
+        .scramble-font { font-family: 'ui-monospace', monospace; }
 
-        /* Magnetic Wrap */
         .mag-wrap {
             display: inline-block;
             transition: transform 0.2s ease-out;
         }
 
-        /* Logo Glow */
         .logo-glow {
             box-shadow: 0 0 20px rgba(255, 209, 102, 0.1);
             transition: all 0.3s ease;
@@ -79,7 +70,6 @@
             border-color: rgba(255, 209, 102, 0.5);
         }
 
-        /* Image Rotation Styles */
         #product-image {
             transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 1, 0.2, 1);
         }
@@ -92,7 +82,6 @@
 <body class="antialiased">
     <div id="spotlight"></div>
 
-    <!-- Navigation -->
     <header class="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-xl">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-4">
@@ -103,23 +92,29 @@
                     <span class="text-[10px] text-amber-400 font-bold tracking-[0.4em] uppercase">Engineered</span>
                 </div>
             </div>
+            
             <nav class="hidden md:flex gap-8 text-[11px] font-black uppercase tracking-widest text-gray-400 items-center">
-                <a href="#" class="hover:text-amber-400 transition-colors">Home</a>
-                <a href="#" class="hover:text-amber-400 transition-colors">About</a>
+                <a href="home.html" class="hover:text-amber-400 transition-colors">Home</a>
+                <a href="about.html" class="hover:text-amber-400 transition-colors">About</a>
                 <a href="product.html" class="hover:text-amber-400 transition-colors">Products</a>
-                <a href="#" class="hover:text-amber-400 transition-colors">Contact</a>
+                <a href="contact.html" class="hover:text-amber-400 transition-colors">Contact</a>
+                
                 <div class="w-px h-4 bg-white/10 mx-2"></div>
-                <a href="#" class="bg-amber-400 text-black px-5 py-2 rounded-full hover:scale-105 transition-transform flex items-center gap-2">
-                    <span>Store</span>
+                
+                <a href="logregister.html" class="hover:text-white transition-colors flex items-center gap-2 px-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Login</span>
+                </a>
+
+                <a href="cart.html" class="bg-amber-400 text-black px-5 py-2 rounded-full hover:scale-105 transition-transform flex items-center gap-2">
+                    <span class="font-black">Cart (<span id="nav-cart-count">0</span>) 🛒</span>
                 </a>
             </nav>
         </div>
     </header>
 
-    <!-- Hero Section -->
     <main class="min-h-screen flex items-center pt-24 relative z-10">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
-            <!-- Hero Content -->
             <div class="space-y-10">
                 <div class="space-y-4">
                     <span class="text-amber-400 font-bold tracking-[0.4em] uppercase text-xs block fade-up" id="tag">Performance Series</span>
@@ -133,13 +128,8 @@
 
                 <div class="flex flex-wrap gap-5 fade-up" id="btns">
                     <div class="mag-wrap">
-                        <button class="bg-amber-400 text-black px-10 py-5 rounded-2xl font-black uppercase tracking-tight hover:shadow-[0_0_40px_rgba(255,209,102,0.3)] transition-all">
-                            Shop The Line
-                        </button>
-                    </div>
-                    <div class="mag-wrap">
-                        <button class="border border-white/10 px-10 py-5 rounded-2xl font-bold uppercase tracking-tight hover:bg-white/5 transition-all">
-                            Flavor Lab
+                        <button onclick="addHeroToCart()" class="bg-amber-400 text-black px-10 py-5 rounded-2xl font-black uppercase tracking-tight hover:shadow-[0_0_40px_rgba(255,209,102,0.3)] transition-all">
+                           Add to Arsenal
                         </button>
                     </div>
                 </div>
@@ -160,7 +150,6 @@
                 </div>
             </div>
 
-            <!-- Carousel Showcase -->
             <div class="stage-container h-[600px] flex items-center justify-center relative">
                 <div class="img-wrap w-full h-full flex items-center justify-center relative" id="stage">
                     <div class="absolute w-72 h-[500px] bg-amber-400/5 blur-[120px] rounded-full"></div>
@@ -179,194 +168,137 @@
         </div>
     </main>
 
-    <!-- Featured Products Row -->
     <section class="bg-black/80 border-t border-white/10 py-20">
         <div class="max-w-7xl mx-auto px-6">
             <span class="text-amber-400 font-bold tracking-[0.4em] uppercase text-xs block mb-10">Featured Products</span>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                
-                <!-- Product 1: Creatine -->
-                <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 flex flex-col items-center text-center">
-                    <img src="creatine.jpg" alt="Creatine Monohydrate" class="max-h-[250px] mb-6 rounded-lg border border-white/10"
-                         onerror="this.src='https://placehold.co/250x250/111/ffd166?text=CREATINE'">
+                <div class="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col items-center text-center">
+                    <img src="creatine.jpg" class="max-h-[250px] mb-6 rounded-lg" onerror="this.src='https://placehold.co/250x250/111/ffd166?text=CREATINE'">
                     <h3 class="text-white text-xl font-black mb-2">Creatine Monohydrate</h3>
-                    <p class="text-gray-400 text-sm mb-4">Micronized for absorption. 3g per scoop. Blueberry flavor.</p>
-                    <button class="bg-amber-400 text-black px-6 py-2 rounded-full font-black uppercase tracking-tight hover:scale-105 transition-transform">
-                        Explore
-                    </button>
+                    <p class="text-gray-400 text-sm mb-4">₹1,299</p>
+                    <button onclick="addToCart('Creatine Monohydrate', 1299, 'creatine.jpg')" class="bg-amber-400 text-black px-6 py-2 rounded-full font-black uppercase text-xs">Add to Cart</button>
                 </div>
 
-                <!-- Product 2: Mega Men Sport -->
-                <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 flex flex-col items-center text-center">
-                    <img src="vitamin.jpg" alt="Mega Men Sport" class="max-h-[250px] mb-6 rounded-lg border border-white/10"
-                         onerror="this.src='https://placehold.co/250x250/111/ffd166?text=MEN+SPORT'">
+                <div class="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col items-center text-center">
+                    <img src="vitamin.jpg" class="max-h-[250px] mb-6 rounded-lg" onerror="this.src='https://placehold.co/250x250/111/ffd166?text=MEN+SPORT'">
                     <h3 class="text-white text-xl font-black mb-2">Mega Men Sport</h3>
-                    <p class="text-gray-400 text-sm mb-4">Multivitamin with 43 premium ingredients for active men. 60 tablets.</p>
-                    <button class="bg-amber-400 text-black px-6 py-2 rounded-full font-black uppercase tracking-tight hover:scale-105 transition-transform">
-                        Explore
-                    </button>
+                    <p class="text-gray-400 text-sm mb-4">₹999</p>
+                    <button onclick="addToCart('Mega Men Sport', 999, 'vitamin.jpg')" class="bg-amber-400 text-black px-6 py-2 rounded-full font-black uppercase text-xs">Add to Cart</button>
                 </div>
 
-                <!-- Product 3: Whey Kesar Pista -->
-                  <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 flex flex-col items-center text-center">
-        <img src="Kesar-Pista.jpg" alt="Whey Kesar Pista" class="max-h-[250px] mb-6 rounded-lg border border-white/10" onerror="this.src='https://placehold.co/250x250/111/ffd166?text=WHEY+KESAR'">
-        <h3 class="text-white text-xl font-black mb-2">100% Whey – Kesar Pista</h3>
-        <p class="text-gray-400 text-sm mb-4">24g protein, 11.4g EAA, zero sugar. 1.81kg.</p>
-        <button class="bg-amber-400 text-black px-6 py-2 rounded-full font-black uppercase tracking-tight hover:scale-105 transition-transform">
-          Explore
-        </button>
+                <div class="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col items-center text-center">
+                    <img src="Kesar-Pista.jpg" class="max-h-[250px] mb-6 rounded-lg" onerror="this.src='https://placehold.co/250x250/111/ffd166?text=WHEY+KESAR'">
+                    <h3 class="text-white text-xl font-black mb-2">Whey Kesar Pista</h3>
+                    <p class="text-gray-400 text-sm mb-4">₹3,499</p>
+                    <button onclick="addToCart('Whey Kesar Pista', 3499, 'Kesar-Pista.jpg')" class="bg-amber-400 text-black px-6 py-2 rounded-full font-black uppercase text-xs">Add to Cart</button>
+                </div>
+            </div>
         </div>
-        <!-- Footer -->
-<footer class="bg-black border-t border-white/10 py-16 text-sm w-screen  text-gray-400 mt-[3rem] ">
-  <div class="px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
-
-    <!-- Brand -->
-    <div>
-      <div class="flex items-center gap-2 mb-4">
-        <img src="logo.png" alt="Gainz Logo" class="w-8 h-8 rounded border border-white/10">
-        <span class="text-white font-black text-xl uppercase tracking-tight">Gainz</span>
-      </div>
-      <p class="text-xs text-amber-400 uppercase tracking-[0.3em] font-bold">Engineered Nutrition</p>
-    </div>
-
-    <!-- Menu -->
-    <div>
-      <h4 class="text-white font-bold uppercase text-xs mb-4 tracking-widest">Menu</h4>
-      <ul class="space-y-2">
-        <li><a href="#" class="hover:text-amber-400">Home</a></li>
-        <li><a href="#" class="hover:text-amber-400">About</a></li>
-        <li><a href="#" class="hover:text-amber-400">Products</a></li>
-        <li><a href="#" class="hover:text-amber-400">Contact</a></li>
-      </ul>
-    </div>
-
-    <!-- Policies -->
-    <div>
-      <h4 class="text-white font-bold uppercase text-xs mb-4 tracking-widest">Policies</h4>
-      <ul class="space-y-2">
-        <li><a href="#" class="hover:text-amber-400">FAQ</a></li>
-        <li><a href="#" class="hover:text-amber-400">Store Policy</a></li>
-        <li><a href="#" class="hover:text-amber-400">Shipping & Returns</a></li>
-      </ul>
-    </div>
-
-    <!-- Contact -->
-    <div>
-      <h4 class="text-white font-bold uppercase text-xs mb-4 tracking-widest">Contact</h4>
-      <p>+91 98765 43210</p>
-      <p>101 Alpha Street</p>
-      <p>Ahmedabad, Gujarat 380015</p>
-      <div class="flex gap-4 mt-4 text-white">
-        <a href="#"><i class="fab fa-facebook-f hover:text-amber-400"></i></a>
-        <a href="#"><i class="fab fa-twitter hover:text-amber-400"></i></a>
-        <a href="#"><i class="fab fa-instagram hover:text-amber-400"></i></a>
-        <a href="#"><i class="fab fa-youtube hover:text-amber-400"></i></a>
-      </div>
-    </div>
-
-  </div>
-</footer>
-<script src="https://kit.fontawesome.com/your-kit-id.js" crossorigin="anonymous"></script>
-
+    </section>
 
     <script>
-        // Configuration
+        // --- NEW CART LOGIC ---
+        function addToCart(name, price, image) {
+            let cart = JSON.parse(localStorage.getItem('gainz_cart')) || [];
+            const existingItem = cart.find(item => item.name === name);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ name, price, image, quantity: 1 });
+            }
+            
+            localStorage.setItem('gainz_cart', JSON.stringify(cart));
+            updateNavCount();
+            
+            // Subtle feedback
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "ADDED!";
+            setTimeout(() => btn.innerText = originalText, 1500);
+        }
+
+        function addHeroToCart() {
+            const currentFlavor = document.getElementById('flavor-tag').innerText;
+            const currentImg = document.getElementById('product-image').src;
+            addToCart(`Elite Whey - ${currentFlavor}`, 3899, currentImg);
+        }
+
+        function updateNavCount() {
+            const cart = JSON.parse(localStorage.getItem('gainz_cart')) || [];
+            const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+            document.getElementById('nav-cart-count').innerText = count;
+        }
+
+        // --- EXISTING ANIMATION LOGIC ---
         const images = ["cutout1.png", "cutout2.png", "cutout3.png"];
         const flavors = ["Mango Smoothie", "Vanilla Pro", "Kesar-Pista"];
         let currentIndex = 0;
 
-        // 1. Automatic Image Rotation (Every 3s)
         function startCarousel() {
             const imgEl = document.getElementById('product-image');
             const tagEl = document.getElementById('flavor-tag');
-
+            if(!imgEl) return;
             setInterval(() => {
-                // Fade out
                 imgEl.classList.add('img-hidden');
-                
                 setTimeout(() => {
                     currentIndex = (currentIndex + 1) % images.length;
                     imgEl.src = images[currentIndex];
                     tagEl.innerText = flavors[currentIndex];
-                    
-                    // Fade in
                     imgEl.classList.remove('img-hidden');
-                }, 800); // Wait for fade out to finish
-            }, 3000); // 3 Second rotation
+                }, 800);
+            }, 3000);
         }
 
-        // 2. Cyber Scramble Title
         function runScramble(el) {
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
             const goal = el.dataset.value;
             let count = 0;
-            
             const timer = setInterval(() => {
                 el.innerText = goal.split("").map((letter, i) => {
                     if(i < count) return goal[i];
                     if(letter === " ") return " ";
                     return chars[Math.floor(Math.random() * chars.length)];
                 }).join("");
-                
                 if(count >= goal.length) clearInterval(timer);
                 count += 1/3;
             }, 30);
         }
 
-        // 3. Mouse Parallax & Spotlight
         const initInteractions = () => {
             window.addEventListener('mousemove', (e) => {
                 const { clientX, clientY } = e;
-                
-                // Update Spotlight
                 const spotlight = document.getElementById('spotlight');
                 spotlight.style.setProperty('--mouse-x', `${clientX}px`);
                 spotlight.style.setProperty('--mouse-y', `${clientY}px`);
 
-                // Stage Rotation
                 const stage = document.getElementById('stage');
                 const centerX = window.innerWidth / 2;
                 const centerY = window.innerHeight / 2;
                 const rotX = (clientY - centerY) / 65;
                 const rotY = (centerX - clientX) / 65;
-                stage.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-
-                // Magnetic Buttons
-                const mags = document.querySelectorAll('.mag-wrap');
-                mags.forEach(m => {
-                    const r = m.getBoundingClientRect();
-                    const mX = r.left + r.width / 2;
-                    const mY = r.top + r.height / 2;
-                    const dist = Math.hypot(clientX - mX, clientY - mY);
-                    
-                    if (dist < 120) {
-                        const tx = (clientX - mX) * 0.4;
-                        const ty = (clientY - mY) * 0.4;
-                        m.style.transform = `translate(${tx}px, ${ty}px)`;
-                    } else {
-                        m.style.transform = `translate(0px, 0px)`;
-                    }
-                });
+                if(stage) stage.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
             });
         };
 
-        // 4. Content Entrance Sequence
         const reveal = () => {
             const sequence = ['tag', 'title', 'desc', 'btns', 'stats'];
             sequence.forEach((id, i) => {
                 setTimeout(() => {
                     const el = document.getElementById(id);
-                    el.classList.add('visible');
-                    if(id === 'title') runScramble(el);
+                    if(el) {
+                        el.classList.add('visible');
+                        if(id === 'title') runScramble(el);
+                    }
                 }, 400 + (i * 150));
             });
         };
 
-        // App Boot
         window.addEventListener('DOMContentLoaded', () => {
             initInteractions();
             startCarousel();
+            updateNavCount();
             setTimeout(reveal, 400);
         });
     </script>
