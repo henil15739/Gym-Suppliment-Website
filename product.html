@@ -14,45 +14,28 @@
             background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 209, 102, 0.06), transparent 80%);
         }
 
-        .stage-container { perspective: 1200px; }
-        .img-wrap { transform-style: preserve-3d; transition: transform 0.2s ease-out; }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(1deg); }
-        }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-
-        #product-title, #product-desc, #product-stats, #flavor-container, #main-image, #product-price {
-            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .scramble-font { font-family: 'ui-monospace', monospace; }
-        
         .nav-glass {
             background: rgba(5, 5, 5, 0.8);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .category-card { transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
-        .category-card.active {
-            border-color: #ffd166;
-            background: rgba(255, 209, 102, 0.1);
-            transform: translateY(-5px);
-        }
+        .brand-nav { background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        
+        .selector-btn { transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .selector-btn.active { border-color: #ffd166; background: rgba(255, 209, 102, 0.1); color: #ffd166; }
 
-        .flavor-btn {
-            transition: all 0.2s ease;
-            border: 1px solid rgba(255, 209, 102, 0.1);
-            cursor: pointer;
-        }
-        .flavor-btn.active {
-            background: #ffd166;
-            color: #000;
-            border-color: #ffd166;
-            box-shadow: 0 0 15px rgba(255, 209, 102, 0.3);
-        }
+        .flavor-pill { transition: all 0.2s ease; border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; }
+        .flavor-pill.active { background: #ffd166; color: #000; border-color: #ffd166; box-shadow: 0 0 15px rgba(255, 209, 102, 0.2); }
+
+        .stage-container { perspective: 1200px; }
+        .img-wrap { transform-style: preserve-3d; transition: transform 0.4s cubic-bezier(0.2, 1, 0.2, 1); }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .scramble-font { font-family: 'ui-monospace', monospace; }
+        
+        #main-image { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .img-hidden { opacity: 0; transform: scale(0.8) rotateY(15deg); }
     </style>
 </head>
 <body class="antialiased">
@@ -60,244 +43,206 @@
 
     <header class="fixed top-0 left-0 right-0 z-50 nav-glass">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-black">
-                    <img src="logo.png" alt="" onerror="this.style.display='none'">G
-                </div>
-                <span class="font-black text-xl tracking-tighter uppercase">Gainz</span>
-            </div>
+            <a href="home.html" class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-amber-400 rounded flex items-center justify-center text-black font-black">G</div>
+                <span class="font-black text-xl tracking-tighter uppercase text-white">Gainz</span>
+            </a>
             <div class="flex items-center gap-6">
                 <a href="cart.html" class="text-[10px] font-black tracking-widest text-gray-400 uppercase hover:text-amber-400 transition-colors">
-                    Cart (<span id="cart-count">0</span>)
+                    Cart (<span id="cart-count">0</span>) 🛒
                 </a>
-                <button class="bg-white text-black text-[10px] font-black px-4 py-2 rounded-full uppercase">Menu</button>
+                <a href="home.html" class="bg-white text-black text-[10px] font-black px-4 py-2 rounded-full uppercase">Home</a>
+            </div>
+        </div>
+
+        <div class="brand-nav">
+            <div class="max-w-7xl mx-auto px-6 py-3 flex gap-4 items-center overflow-x-auto no-scrollbar">
+                <span class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">Select Type:</span>
+                <button onclick="selectCategory('whey')" class="selector-btn category-link active px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest" data-cat="whey">Whey Protein</button>
+                <button onclick="selectCategory('creatine')" class="selector-btn category-link px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest" data-cat="creatine">Creatine</button>
+                <button onclick="selectCategory('preworkout')" class="selector-btn category-link px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest" data-cat="preworkout">Pre-Workout</button>
+                <button onclick="selectCategory('omega')" class="selector-btn category-link px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest" data-cat="omega">Omega-3</button>
             </div>
         </div>
     </header>
 
-    <main class="min-h-screen flex flex-col justify-center pt-20 relative z-10">
+    <main class="min-h-screen flex flex-col justify-center pt-48 pb-12 relative z-10">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
             
             <div class="order-2 lg:order-1 space-y-8">
-                <div>
-                    <div class="flex items-center gap-4 mb-2">
-                        <span id="product-cat-label" class="text-amber-400 font-bold tracking-[0.5em] text-[10px] uppercase block">Performance Series</span>
-                        <span id="product-price" class="text-white font-black text-xl">$0.00</span>
-                    </div>
-                    <h1 id="product-title" class="text-6xl md:text-7xl font-black leading-none scramble-font mb-6 uppercase" data-value="WHEY ISOLATE">WHEY ISOLATE</h1>
-                    <p id="product-desc" class="text-gray-400 text-lg max-w-md leading-relaxed">
-                        Precision-engineered whey isolate for maximum muscle synthesis and rapid recovery.
-                    </p>
-                    
-                    <div id="flavor-container" class="mt-8 flex flex-wrap gap-3"></div>
+                <div class="space-y-4">
+                    <span class="text-[9px] font-black text-amber-400 uppercase tracking-[0.3em]">Step 02: Choose Brand</span>
+                    <div id="brand-container" class="flex flex-wrap gap-3"></div>
                 </div>
 
-                <div id="product-stats" class="grid grid-cols-3 gap-8 py-8 border-y border-white/5"></div>
+                <div id="flavor-section" class="space-y-4">
+                    <span class="text-[9px] font-black text-amber-400 uppercase tracking-[0.3em]">Step 03: Select Flavor</span>
+                    <div id="flavor-list" class="flex flex-wrap gap-2"></div>
+                </div>
 
-                <div class="flex gap-4">
-                    <button id="add-to-cart-btn" onclick="addToStack()" class="bg-amber-400 text-black px-8 py-4 rounded-xl font-black uppercase text-sm hover:scale-105 transition-transform active:scale-95">
+                <div class="pt-6 border-t border-white/5">
+                    <div class="flex items-center gap-4 mb-2">
+                        <span id="product-brand-label" class="text-white/40 font-bold text-[10px] uppercase tracking-widest border border-white/10 px-2 py-1 rounded">BRAND</span>
+                        <span id="product-price" class="text-amber-400 font-black text-2xl">₹0</span>
+                    </div>
+                    <h1 id="product-title" class="text-4xl md:text-5xl font-black leading-tight scramble-font uppercase mb-4" data-value="PRODUCT NAME">INITIALIZING...</h1>
+                    
+                    <div id="product-stats" class="grid grid-cols-3 gap-6 py-6 mb-8 border-y border-white/5"></div>
+
+                    <button id="add-btn" onclick="addToStack()" class="bg-amber-400 text-black px-10 py-4 rounded-xl font-black uppercase text-sm hover:scale-105 transition-transform">
                         Add to Stack
                     </button>
-                    <button class="border border-white/10 px-8 py-4 rounded-xl font-black uppercase text-sm hover:bg-white/5 transition-all">Lab Report</button>
                 </div>
             </div>
 
             <div class="order-1 lg:order-2 stage-container flex items-center justify-center">
                 <div class="img-wrap animate-float relative" id="stage">
-                    <div class="absolute inset-0 bg-amber-400/20 blur-[120px] rounded-full"></div>
-                    <img id="main-image" src="" alt="Product" class="relative z-10 max-h-[550px] object-contain drop-shadow-[0_35px_60px_rgba(0,0,0,0.8)]">
-                </div>
-            </div>
-        </div>
-
-        <div class="max-w-7xl mx-auto px-6 w-full mt-12 pb-12">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div onclick="updateProduct('protein')" class="category-card active p-4 border border-white/5 rounded-2xl cursor-pointer" data-id="protein">
-                    <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">01. Protein</span>
-                    <h3 class="font-black text-sm uppercase">Whey Isolate</h3>
-                </div>
-                <div onclick="updateProduct('preworkout')" class="category-card p-4 border border-white/5 rounded-2xl cursor-pointer" data-id="preworkout">
-                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">02. Energy</span>
-                    <h3 class="font-black text-sm uppercase">Pre-Workout</h3>
-                </div>
-                <div onclick="updateProduct('creatine')" class="category-card p-4 border border-white/5 rounded-2xl cursor-pointer" data-id="creatine">
-                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">03. Power</span>
-                    <h3 class="font-black text-sm uppercase">Creatine</h3>
-                </div>
-                <div onclick="updateProduct('omegas')" class="category-card p-4 border border-white/5 rounded-2xl cursor-pointer" data-id="omegas">
-                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">04. Health</span>
-                    <h3 class="font-black text-sm uppercase">Omegas</h3>
+                    <div class="absolute inset-0 bg-amber-400/10 blur-[100px] rounded-full"></div>
+                    <img id="main-image" src="" alt="" class="relative z-10 max-h-[450px] object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,0.7)]">
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        const products = {
-            protein: {
-                title: "WHEY ISOLATE",
-                cat: "Performance Series",
-                basePrice: 54.99,
-                desc: "Triple-filtered whey isolate delivering 24g of pure protein with zero fillers or bloating.",
-                stats: [{v:"24g", l:"Protein"}, {v:"0g", l:"Sugar"}, {v:"5.5g", l:"BCAA"}],
-                flavors: [
-                    { name: "Vanilla Pro", img: "cutout2.png" },
-                    { name: "Mango Smoothie", img: "cutout1.png" },
-                    { name: "Kesar-Pista", img: "cutout3.png" }
-                ]
-            },
-            preworkout: {
-                title: "VOLTAGE PRE",
-                cat: "Focus Series",
-                basePrice: 44.99,
-                desc: "High-stimulant pre-workout designed for skin-splitting pumps and laser-like mental clarity.",
-                stats: [{v:"350mg", l:"Caffeine"}, {v:"6g", l:"Citrulline"}, {v:"3.2g", l:"Beta-Al"}],
-                flavors: [
-                    { name: "Blue Raspberry", img: "precutout.png" },
-                    { name: "Fruit Punch", img: "cutoutfruit.png" }
-                ]
+        const storeData = {
+            whey: {
+                gnc: { name: "GNC Whey", price: 3499, stats: ["24g Prot", "0g Sugar", "5.5g BCAA"], 
+                    flavors: [{f: "Vanilla", img: "cutout2.png"}, {f: "Mango", img: "cutout1.png"}, {f: "Kesar", img: "cutout3.png"}] },
+                mb: { name: "MB Biozyme", price: 2899, stats: ["25g Prot", "11.7g EAA", "5.5g BCAA"], 
+                    flavors: [{f: "Rich Choco", img: "mb_choco.png"}, {f: "Mocha", img: "mb_mocha.png"}] },
+                avvatar: { name: "Avvatar Whey", price: 2699, stats: ["24g Prot", "7.8g EAA", "Cow Milk"], 
+                    flavors: [{f: "Malai Kulfi", img: "avvatar_kulfi.png"}, {f: "Chocolate", img: "avvatar_choco.png"}] },
+                atom: { name: "Atom Whey", price: 1899, stats: ["27g Prot", "12g EAA", "Rapid"], 
+                    flavors: [{f: "Standard", img: "atom_whey.png"}] }
             },
             creatine: {
-                title: "CREATINE MAX",
-                cat: "Strength Series",
-                basePrice: 29.99,
-                desc: "Micronized creatine monohydrate to increase ATP production and muscle explosive power.",
-                stats: [{v:"5g", l:"Creatine"}, {v:"100%", l:"Pure"}, {v:"80", l:"Servings"}],
-                flavors: [
-                    { name: "Unflavored", img: "cutoutunflavored.png" },
-                    { name: "Lemon", img: "cutoutlemon.png" },
-                    { name: "Blueberry", img: "creatinecutout.png" }
-                ]
+                wellcore: { name: "Wellcore Creatine", price: 1499, stats: ["3g Pure", "83 Serv", "Explosive"], 
+                    flavors: [{f: "Unflavored", img: "wellcore_creatine.png"}, {f: "Lemon", img: "wellcore_lemon.png"}] },
+                avvatar: { name: "Avvatar Creatine", price: 1099, stats: ["3g Pure", "Purest", "Lean"], 
+                    flavors: [{f: "Standard", img: "avvatar_creatine.png"}] },
+                gnc: { name: "GNC Creatine", price: 1299, stats: ["5g Pure", "80 Serv", "Core"], 
+                    flavors: [{f: "Standard", img: "cutoutunflavored.png"}] },
+                mb: { name: "MB Creatine", price: 1399, stats: ["3g Pure", "Clinically", "Power"], 
+                    flavors: [{f: "Unflavored", img: "mb_creatine.png"}] }
             },
-            omegas: {
-                title: "OMEGA ELITE",
-                cat: "Longevity Series",
-                basePrice: 19.99,
-                desc: "Premium fish oil concentrate for joint lubrication, heart health, and cognitive function.",
-                stats: [{v:"1200mg", l:"Omega-3"}, {v:"800mg", l:"EPA"}, {v:"600mg", l:"DHA"}],
-                img: "vitamincutout.png"
+            preworkout: {
+                black_beast: { name: "Black Beast Pre", price: 1699, stats: ["400mg Caff", "8g Cit", "Extreme"], 
+                    flavors: [{f: "Blue Blast", img: "blackbeast_pre.png"}, {f: "Apple", img: "beast_apple.png"}] },
+                wellcore: { name: "Wellcore Pre", price: 2199, stats: ["300mg Caff", "Focus", "Clean"], 
+                    flavors: [{f: "Litchi", img: "wellcore_pre.png"}] },
+                bigmuscle: { name: "BigMuscle Freak", price: 1299, stats: ["350mg Caff", "Vaso6", "Hardcore"], 
+                    flavors: [{f: "Fruit Punch", img: "bigmuscle_pre.png"}] },
+                gnc: { name: "GNC AMP Pre", price: 2499, stats: ["300mg Caff", "Energy", "AMP"], 
+                    flavors: [{f: "Standard", img: "precutout.png"}] }
+            },
+            omega: {
+                wellcore: { name: "Wellcore Omega", price: 1199, stats: ["1200mg Oil", "900mg EPA", "Heart"], flavors: [{f: "Standard", img: "wellcore_omega.png"}] },
+                mb: { name: "MB Fish Oil", price: 999, stats: ["1000mg Oil", "Absorption", "Pure"], flavors: [{f: "Standard", img: "mb_fishoil.png"}] },
+                gnc: { name: "GNC Omega", price: 1499, stats: ["1500mg Oil", "900mg EPA", "Gold"], flavors: [{f: "Standard", img: "vitamincutout.png"}] }
             }
         };
 
-        let currentActiveKey = 'protein';
-        let currentActiveFlavorName = "";
+        let activeCat = 'whey';
+        let activeBrand = '';
+        let activeFlavor = '';
 
-        // --- CART LOGIC START ---
+        function getCartKey() {
+            const userData = JSON.parse(localStorage.getItem('gainz_user'));
+            return userData && userData.isLoggedIn ? `gainz_cart_${userData.email}` : `gainz_cart_guest`;
+        }
+
         function updateCartBadge() {
-            const cart = JSON.parse(localStorage.getItem('gainz_cart')) || [];
-            const count = cart.reduce((total, item) => total + item.quantity, 0);
-            document.getElementById('cart-count').innerText = count;
+            const cartKey = getCartKey();
+            const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+            document.getElementById('cart-count').innerText = cart.reduce((t, i) => t + i.quantity, 0);
         }
 
-        function addToStack() {
-            const data = products[currentActiveKey];
-            const name = currentActiveFlavorName ? `${data.title} (${currentActiveFlavorName})` : data.title;
-            const price = data.basePrice;
-            const image = document.getElementById('main-image').src;
+        function selectCategory(cat) {
+            activeCat = cat;
+            document.querySelectorAll('.category-link').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-cat="${cat}"]`).classList.add('active');
 
-            let cart = JSON.parse(localStorage.getItem('gainz_cart')) || [];
-            const existingItem = cart.find(item => item.name === name);
-
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({ name, price, image, quantity: 1 });
-            }
-
-            localStorage.setItem('gainz_cart', JSON.stringify(cart));
-            updateCartBadge();
-
-            // Button Feedback
-            const btn = document.getElementById('add-to-cart-btn');
-            const originalText = btn.innerText;
-            btn.innerText = "STACKED!";
-            btn.classList.replace('bg-amber-400', 'bg-white');
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.classList.replace('bg-white', 'bg-amber-400');
-            }, 1000);
-        }
-        // --- CART LOGIC END ---
-
-        function updateProduct(key) {
-            currentActiveKey = key;
-            const data = products[key];
+            const brandContainer = document.getElementById('brand-container');
+            const availableBrands = Object.keys(storeData[cat]);
             
-            document.querySelectorAll('.category-card').forEach(c => {
-                c.classList.remove('active');
-                c.querySelector('span').classList.replace('text-amber-400', 'text-gray-500');
-            });
-            const activeCard = document.querySelector(`[data-id="${key}"]`);
-            activeCard.classList.add('active');
-            activeCard.querySelector('span').classList.replace('text-gray-500', 'text-amber-400');
-
-            const content = [
-                document.getElementById('product-title'), 
-                document.getElementById('product-desc'), 
-                document.getElementById('product-stats'), 
-                document.getElementById('main-image'),
-                document.getElementById('flavor-container'),
-                document.getElementById('product-price')
-            ];
-            
-            content.forEach(el => { el.style.opacity = '0'; el.style.transform = 'translateY(10px)'; });
-
-            setTimeout(() => {
-                document.getElementById('product-cat-label').innerText = data.cat;
-                document.getElementById('product-title').innerText = data.title;
-                document.getElementById('product-title').dataset.value = data.title;
-                document.getElementById('product-desc').innerText = data.desc;
-                document.getElementById('product-price').innerText = `$${data.basePrice.toFixed(2)}`;
-
-                const defaultImg = data.flavors ? data.flavors[0].img : data.img;
-                currentActiveFlavorName = data.flavors ? data.flavors[0].name : "";
-                document.getElementById('main-image').src = defaultImg;
-
-                const flavorContainer = document.getElementById('flavor-container');
-                if (data.flavors) {
-                    flavorContainer.innerHTML = `<span class="w-full text-[9px] uppercase tracking-widest text-gray-500 font-black mb-1">Select Flavor</span>` + 
-                        data.flavors.map((f, i) => `
-                        <button class="flavor-btn px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider ${i===0 ? 'active' : ''}" 
-                                onclick="changeFlavor(this, '${f.img}', '${f.name}')">
-                            ${f.name}
-                        </button>
-                    `).join('');
-                } else {
-                    flavorContainer.innerHTML = '';
-                    currentActiveFlavorName = "";
-                }
-
-                const statsHTML = data.stats.map(s => `
-                    <div>
-                        <div class="text-2xl font-black">${s.v}</div>
-                        <div class="text-[9px] uppercase tracking-widest text-gray-500 font-bold">${s.l}</div>
-                    </div>
-                `).join('');
-                document.getElementById('product-stats').innerHTML = statsHTML;
-
-                content.forEach(el => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
-                runScramble(document.getElementById('product-title'));
-            }, 300);
+            brandContainer.innerHTML = availableBrands.map(b => `
+                <button onclick="selectBrand('${b}')" class="selector-btn brand-btn px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest" data-brand="${b}">
+                    ${b.replace('_', ' ')}
+                </button>
+            `).join('');
+            selectBrand(availableBrands[0]);
         }
 
-        function changeFlavor(btn, imgSrc, flavorName) {
-            currentActiveFlavorName = flavorName;
+        function selectBrand(brand) {
+            activeBrand = brand;
+            const data = storeData[activeCat][brand];
+            
+            document.querySelectorAll('.brand-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-brand="${brand}"]`).classList.add('active');
+
+            const flavorList = document.getElementById('flavor-list');
+            flavorList.innerHTML = data.flavors.map(flav => `
+                <button onclick="setFlavor('${flav.f}', '${flav.img}')" class="flavor-pill px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-tighter" data-flav="${flav.f}">
+                    ${flav.f}
+                </button>
+            `).join('');
+
+            setFlavor(data.flavors[0].f, data.flavors[0].img);
+            
+            document.getElementById('product-brand-label').innerText = brand.replace('_', ' ').toUpperCase();
+            document.getElementById('product-price').innerText = `₹${data.price.toLocaleString('en-IN')}`;
+            
+            const statsHTML = data.stats.map(s => {
+                const parts = s.split(' ');
+                return `<div><div class="text-xl font-black text-white">${parts[0]}</div><div class="text-[8px] uppercase font-bold text-white/40">${parts.slice(1).join(' ')}</div></div>`;
+            }).join('');
+            document.getElementById('product-stats').innerHTML = statsHTML;
+        }
+
+        function setFlavor(flavor, img) {
+            activeFlavor = flavor;
             const imgEl = document.getElementById('main-image');
-            document.querySelectorAll('.flavor-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            imgEl.style.opacity = '0';
-            imgEl.style.transform = 'scale(0.95)';
+            const titleEl = document.getElementById('product-title');
+            const data = storeData[activeCat][activeBrand];
             
+            document.querySelectorAll('.flavor-pill').forEach(p => p.classList.remove('active'));
+            const activePill = document.querySelector(`[data-flav="${flavor}"]`);
+            if(activePill) activePill.classList.add('active');
+
+            imgEl.classList.add('img-hidden');
             setTimeout(() => {
-                imgEl.src = imgSrc;
-                imgEl.style.opacity = '1';
-                imgEl.style.transform = 'scale(1)';
+                imgEl.src = img;
+                const fullName = `${data.name} (${flavor})`;
+                titleEl.innerText = fullName;
+                titleEl.dataset.value = fullName;
+                imgEl.classList.remove('img-hidden');
+                runScramble(titleEl);
             }, 250);
         }
 
+        function addToStack() {
+            const data = storeData[activeCat][activeBrand];
+            const cartKey = getCartKey();
+            let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+            
+            const fullName = `${data.name} (${activeFlavor})`;
+            const existing = cart.find(item => item.name === fullName);
+            
+            if (existing) { existing.quantity += 1; } 
+            else { 
+                cart.push({ name: fullName, price: data.price, image: document.getElementById('main-image').src, quantity: 1 }); 
+            }
+            
+            localStorage.setItem(cartKey, JSON.stringify(cart));
+            updateCartBadge();
+            const btn = document.getElementById('add-btn');
+            btn.innerText = "STACKED!";
+            setTimeout(() => { btn.innerText = "Add to Stack"; }, 1000);
+        }
+
         function runScramble(el) {
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+            const chars = "ABCDEFGHIJK0123456!@#";
             const goal = el.dataset.value;
             let count = 0;
             const timer = setInterval(() => {
@@ -306,23 +251,16 @@
                     return letter === " " ? " " : chars[Math.floor(Math.random() * chars.length)];
                 }).join("");
                 if(count >= goal.length) clearInterval(timer);
-                count += 1/3;
-            }, 30);
+                count += 1.5;
+            }, 25);
         }
 
         window.addEventListener('mousemove', (e) => {
             document.getElementById('spotlight').style.setProperty('--mouse-x', `${e.clientX}px`);
             document.getElementById('spotlight').style.setProperty('--mouse-y', `${e.clientY}px`);
-            const moveX = (e.clientX - window.innerWidth/2) / 50;
-            const moveY = (e.clientY - window.innerHeight/2) / 50;
-            const stage = document.getElementById('stage');
-            if(stage) stage.style.transform = `rotateY(${moveX}deg) rotateX(${-moveY}deg)`;
         });
 
-        window.onload = () => {
-            updateProduct('protein');
-            updateCartBadge();
-        };
+        window.onload = () => { selectCategory('whey'); updateCartBadge(); };
     </script>
 </body>
 </html>

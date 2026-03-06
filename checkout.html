@@ -8,7 +8,6 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function(){
-            // Replace with your actual Public Key from EmailJS Account Settings
             emailjs.init("JT5UgqiJ2zQONbcXO"); 
         })();
     </script>
@@ -47,7 +46,7 @@
 
     <main class="pt-32 pb-20 px-6">
         <div class="max-w-4xl mx-auto">
-            <h1 class="text-4xl font-black mb-10 scramble-font tracking-tighter uppercase">Checkout // Secure_Deployment</h1>
+            <h1 class="text-4xl font-black mb-10 scramble-font tracking-tighter uppercase">Checkout // Deployment</h1>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 <div class="space-y-8">
@@ -55,33 +54,17 @@
                         <h2 class="text-amber-400 font-black text-xs uppercase tracking-[0.3em] mb-6">01. Shipping Information</h2>
                         <form id="checkout-form" class="space-y-4">
                             <div class="grid grid-cols-2 gap-4">
-                                <input type="text" placeholder="First Name" required class="input-field w-full p-4 rounded-xl text-sm">
-                                <input type="text" placeholder="Last Name" required class="input-field w-full p-4 rounded-xl text-sm">
+                                <input type="text" id="fname" placeholder="First Name" required class="input-field w-full p-4 rounded-xl text-sm">
+                                <input type="text" id="lname" placeholder="Last Name" required class="input-field w-full p-4 rounded-xl text-sm">
                             </div>
-                            <input type="email" placeholder="Email Address" required class="input-field w-full p-4 rounded-xl text-sm">
-                            <input type="tel" placeholder="Phone Number" required class="input-field w-full p-4 rounded-xl text-sm">
-                            <input type="text" placeholder="Full Street Address" required class="input-field w-full p-4 rounded-xl text-sm">
+                            <input type="email" id="uemail" placeholder="Email Address" required class="input-field w-full p-4 rounded-xl text-sm">
+                            <input type="tel" id="uphone" placeholder="Phone Number" required class="input-field w-full p-4 rounded-xl text-sm">
+                            <input type="text" id="uaddress" placeholder="Full Street Address" required class="input-field w-full p-4 rounded-xl text-sm">
                             <div class="grid grid-cols-2 gap-4">
-                                <input type="text" placeholder="City" required class="input-field w-full p-4 rounded-xl text-sm">
-                                <input type="text" placeholder="PIN Code" required class="input-field w-full p-4 rounded-xl text-sm">
+                                <input type="text" id="ucity" placeholder="City" required class="input-field w-full p-4 rounded-xl text-sm">
+                                <input type="text" id="upin" placeholder="PIN Code" required class="input-field w-full p-4 rounded-xl text-sm">
                             </div>
                         </form>
-                    </section>
-
-                    <section>
-                        <h2 class="text-amber-400 font-black text-xs uppercase tracking-[0.3em] mb-6">02. Payment Method</h2>
-                        <div class="glass p-6 rounded-2xl border-amber-400/50 flex items-center justify-between border">
-                            <div class="flex items-center gap-4">
-                                <div class="w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center">
-                                    <div class="w-2 h-2 bg-black rounded-full"></div>
-                                </div>
-                                <div>
-                                    <p class="font-black uppercase text-sm">Cash On Delivery (COD)</p>
-                                    <p class="text-[10px] text-gray-500 font-bold uppercase">Pay when your fuel arrives</p>
-                                </div>
-                            </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-                        </div>
                     </section>
                 </div>
 
@@ -106,7 +89,7 @@
                             <span class="text-3xl font-black text-amber-400" id="checkout-total">₹0</span>
                         </div>
 
-                        <button onclick="confirmOrder()" class="w-full bg-amber-400 text-black py-5 rounded-2xl font-black uppercase tracking-tighter hover:shadow-[0_0_40px_rgba(255,209,102,0.3)] transition-all">
+                        <button onclick="confirmOrder()" id="confirmBtn" class="w-full bg-amber-400 text-black py-5 rounded-2xl font-black uppercase tracking-tighter hover:shadow-[0_0_40px_rgba(255,209,102,0.3)] transition-all">
                             Confirm Order
                         </button>
                     </div>
@@ -116,13 +99,34 @@
     </main>
 
     <script>
+    // --- HELPER: GET CORRECT USER CART KEY ---
+    function getCartKey() {
+        const userData = JSON.parse(localStorage.getItem('gainz_user'));
+        return userData && userData.isLoggedIn ? `gainz_cart_${userData.email}` : `gainz_cart_guest`;
+    }
+
+    // --- AUTOFILL LOGIC ---
+    function autofillUserData() {
+        const userData = JSON.parse(localStorage.getItem('gainz_user'));
+        if (userData && userData.isLoggedIn) {
+            if(userData.email) document.getElementById('uemail').value = userData.email;
+            if(userData.first_name) document.getElementById('fname').value = userData.first_name;
+            if(userData.last_name) document.getElementById('lname').value = userData.last_name;
+            if(userData.phone) document.getElementById('uphone').value = userData.phone;
+        }
+    }
+
+    // --- SUMMARY LOGIC ---
     function loadSummary() {
-        const cart = JSON.parse(localStorage.getItem('gainz_cart')) || [];
+        const cartKey = getCartKey();
+        const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
         const container = document.getElementById('summary-items');
         let total = 0;
 
         if (cart.length === 0) {
-            window.location.href = 'product.html';
+            container.innerHTML = `<p class="text-gray-500 uppercase text-[10px] tracking-widest text-center py-4">Arsenal is empty</p>`;
+            document.getElementById('checkout-subtotal').innerText = `₹0`;
+            document.getElementById('checkout-total').innerText = `₹0`;
             return 0;
         }
 
@@ -148,29 +152,47 @@
         return total;
     }
 
+    // --- ORDER CONFIRMATION ---
     async function confirmOrder() {
         const form = document.getElementById('checkout-form');
+        const btn = document.getElementById('confirmBtn');
+
         if (!form.checkValidity()) {
             alert("Please complete the shipping mission parameters.");
             return;
         }
 
-        const totalAmount = loadSummary(); 
-        const inputs = form.getElementsByTagName('input');
+        const cartKey = getCartKey();
+        const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+        const totalAmount = loadSummary();
+
+        if (totalAmount === 0) {
+            alert("Your arsenal is empty. Return to product list.");
+            return;
+        }
+
+        btn.innerText = "DEPLOYING...";
+        btn.disabled = true;
+
+        const ordersArray = cart.map(item => ({
+            name: item.name,
+            units: item.quantity, 
+            price: (item.price * item.quantity).toLocaleString('en-IN')
+        }));
 
         const orderPayload = {
-            first_name: inputs[0].value,
-            last_name: inputs[1].value,
-            email: inputs[2].value,
-            phone: inputs[3].value,
-            address: inputs[4].value,
-            city: inputs[5].value,
-            pin_code: inputs[6].value,
+            first_name: document.getElementById('fname').value,
+            last_name: document.getElementById('lname').value,
+            email: document.getElementById('uemail').value,
+            phone: document.getElementById('uphone').value,
+            address: document.getElementById('uaddress').value,
+            city: document.getElementById('ucity').value,
+            pin_code: document.getElementById('upin').value,
             total_amount: totalAmount
         };
 
         try {
-            // STEP 1: Deploy to MySQL via Python
+            // STEP 1: MySQL SYNC
             const response = await fetch('http://127.0.0.1:5000/deploy-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -178,30 +200,33 @@
             });
 
             if (response.ok) {
-                // STEP 2: Trigger EmailJS Confirmation
+                // STEP 2: EMAIL DISPATCH
                 const emailParams = {
-                    first_name: orderPayload.first_name,
+                    user_name: orderPayload.first_name,
                     user_email: orderPayload.email,
-                    total_amount: "₹" + totalAmount.toLocaleString('en-IN'),
-                    order_id: "GAZ-" + Math.floor(100000 + Math.random() * 900000)
+                    order_id: "GAZ-" + Math.floor(Math.random() * 1000000),
+                    orders: ordersArray,
+                    shipping: "0",
+                    tax: "0",
+                    total_amount: totalAmount.toLocaleString('en-IN'),
+                    email: orderPayload.email 
                 };
 
-                emailjs.send("service_esm0slv", "template_w49i0t9", emailParams)
-                    .then(() => {
-                        console.log("Email Dispatched.");
-                        renderSuccessUI();
-                        localStorage.removeItem('gainz_cart');
-                    }, (error) => {
-                        console.error("Email Blocked:", error);
-                        // Still show success as DB is updated
-                        renderSuccessUI();
-                    });
+                await emailjs.send("service_esm0slv", "template_w49i0t9", emailParams);
+                
+                // STEP 3: CLEAR SPECIFIC USER CART & SHOW SUCCESS
+                localStorage.removeItem(cartKey);
+                renderSuccessUI();
             } else {
-                alert("Database Sync Failed. Check Backend.");
+                alert("Database Sync Failed. Check server logs.");
+                btn.innerText = "Confirm Order";
+                btn.disabled = false;
             }
         } catch (error) {
-            console.error("Network Error:", error);
-            alert("Backend Offline. Ensure Python app.py is running.");
+            console.error("Mission Failure:", error);
+            alert("Backend Connection Lost.");
+            btn.innerText = "Confirm Order";
+            btn.disabled = false;
         }
     }
 
@@ -211,16 +236,19 @@
                 <div class="w-20 h-20 bg-amber-400 rounded-full flex items-center justify-center mb-8 animate-bounce">
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
-                <h1 class="text-5xl font-black uppercase scramble-font mb-4">Order_Deployed</h1>
+                <h1 class="text-5xl font-black uppercase mb-4">Order_Deployed</h1>
                 <p class="text-gray-400 max-w-md uppercase text-xs tracking-widest leading-loose">
-                    Your details are synced and a confirmation email is on its way. Stand by for fuel arrival.
+                    Confirmation email is on its way. Stand by for fuel arrival.
                 </p>
-                <a href="index.html" class="mt-12 px-8 py-4 border border-white/10 rounded-full font-black uppercase text-[10px] hover:bg-white/5">Back to Base</a>
+                <a href="home.html" class="mt-12 px-8 py-4 border border-white/10 rounded-full font-black uppercase text-[10px] hover:bg-white/5">Back to Base</a>
             </div>
         `;
     }
 
-    window.onload = loadSummary;
+    window.onload = () => {
+        loadSummary();
+        autofillUserData();
+    };
 </script>
 </body>
 </html>

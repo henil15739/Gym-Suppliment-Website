@@ -19,7 +19,6 @@
             cursor: default;
         }
 
-        /* Spotlight Tracker */
         #spotlight {
             position: fixed;
             inset: 0;
@@ -28,7 +27,6 @@
             background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 209, 102, 0.08), transparent 80%);
         }
 
-        /* 3D Stage */
         .stage-container { perspective: 1500px; }
         .img-wrap {
             transform-style: preserve-3d;
@@ -101,10 +99,12 @@
                 
                 <div class="w-px h-4 bg-white/10 mx-2"></div>
                 
-                <a href="logregister.html" class="hover:text-white transition-colors flex items-center gap-2 px-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <span>Login</span>
-                </a>
+                <div id="auth-section">
+                    <a href="logregister.html" class="hover:text-white transition-colors flex items-center gap-2 px-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span>Login</span>
+                    </a>
+                </div>
 
                 <a href="cart.html" class="bg-amber-400 text-black px-5 py-2 rounded-full hover:scale-105 transition-transform flex items-center gap-2">
                     <span class="font-black">Cart (<span id="nav-cart-count">0</span>) 🛒</span>
@@ -129,7 +129,7 @@
                 <div class="flex flex-wrap gap-5 fade-up" id="btns">
                     <div class="mag-wrap">
                         <button onclick="addHeroToCart()" class="bg-amber-400 text-black px-10 py-5 rounded-2xl font-black uppercase tracking-tight hover:shadow-[0_0_40px_rgba(255,209,102,0.3)] transition-all">
-                           Add to Arsenal
+                            Add to Arsenal
                         </button>
                     </div>
                 </div>
@@ -198,9 +198,41 @@
     </section>
 
     <script>
-        // --- NEW CART LOGIC ---
+        // --- AUTH LOGIC ---
+        function checkAuthStatus() {
+            const authSection = document.getElementById('auth-section');
+            const userData = JSON.parse(localStorage.getItem('gainz_user'));
+
+            if (userData && userData.isLoggedIn) {
+                const name = userData.email.split('@')[0];
+                authSection.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <span class="text-amber-400 font-bold uppercase text-[9px] tracking-widest border border-amber-400/20 px-2 py-1 rounded">Athlete: ${name}</span>
+                        <button onclick="handleLogout()" class="text-gray-500 hover:text-red-500 transition-colors flex items-center gap-1 uppercase text-[10px] font-black">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            Logout
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('gainz_user');
+            window.location.reload(); 
+        }
+
+        // --- DYNAMIC CART KEY LOGIC ---
+        function getCartKey() {
+            const userData = JSON.parse(localStorage.getItem('gainz_user'));
+            // If logged in, use gainz_cart_email, otherwise use gainz_cart_guest
+            return userData && userData.isLoggedIn ? `gainz_cart_${userData.email}` : `gainz_cart_guest`;
+        }
+
+        // --- CART LOGIC ---
         function addToCart(name, price, image) {
-            let cart = JSON.parse(localStorage.getItem('gainz_cart')) || [];
+            const cartKey = getCartKey();
+            let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
             const existingItem = cart.find(item => item.name === name);
             
             if (existingItem) {
@@ -209,10 +241,9 @@
                 cart.push({ name, price, image, quantity: 1 });
             }
             
-            localStorage.setItem('gainz_cart', JSON.stringify(cart));
+            localStorage.setItem(cartKey, JSON.stringify(cart));
             updateNavCount();
             
-            // Subtle feedback
             const btn = event.target;
             const originalText = btn.innerText;
             btn.innerText = "ADDED!";
@@ -226,12 +257,13 @@
         }
 
         function updateNavCount() {
-            const cart = JSON.parse(localStorage.getItem('gainz_cart')) || [];
+            const cartKey = getCartKey();
+            const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
             const count = cart.reduce((acc, item) => acc + item.quantity, 0);
             document.getElementById('nav-cart-count').innerText = count;
         }
 
-        // --- EXISTING ANIMATION LOGIC ---
+        // --- UI EFFECTS ---
         const images = ["cutout1.png", "cutout2.png", "cutout3.png"];
         const flavors = ["Mango Smoothie", "Vanilla Pro", "Kesar-Pista"];
         let currentIndex = 0;
@@ -296,9 +328,10 @@
         };
 
         window.addEventListener('DOMContentLoaded', () => {
+            checkAuthStatus(); 
             initInteractions();
             startCarousel();
-            updateNavCount();
+            updateNavCount(); // This will now fetch the specific user's cart
             setTimeout(reveal, 400);
         });
     </script>

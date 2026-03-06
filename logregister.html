@@ -99,14 +99,14 @@
             <h2 class="text-2xl font-black mb-6 scramble-font" data-value="CREATE PROTOCOL">INITIALIZING...</h2>
             <form id="registerForm" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="text" name="first_name" placeholder="First Name" required class="input-field w-full px-4 py-3 rounded-xl text-white text-sm">
-                    <input type="text" name="last_name" placeholder="Last Name" required class="input-field w-full px-4 py-3 rounded-xl text-white text-sm">
+                    <input type="text" id="regFirstName" name="first_name" placeholder="First Name" required class="input-field w-full px-4 py-3 rounded-xl text-white text-sm">
+                    <input type="text" id="regLastName" name="last_name" placeholder="Last Name" required class="input-field w-full px-4 py-3 rounded-xl text-white text-sm">
                 </div>
-                <input type="email" name="email" placeholder="Email Address" required class="input-field w-full px-4 py-3 rounded-xl text-white text-sm">
-                <input type="password" name="password" placeholder="Password" required class="input-field w-full px-4 py-3 rounded-xl text-white text-sm">
+                <input type="email" id="regEmail" name="email" placeholder="Email Address" required class="input-field w-full px-4 py-3 rounded-xl text-white text-sm">
+                <input type="password" id="regPass" name="password" placeholder="Password" required class="input-field w-full px-4 py-3 rounded-xl text-white text-sm">
                 
                 <div class="flex gap-3 pt-2">
-                    <button type="submit" class="flex-grow border border-amber-400/50 text-amber-400 py-4 rounded-xl font-black uppercase text-xs tracking-tight hover:bg-amber-400 hover:text-black transition-all">
+                    <button type="submit" id="regBtn" class="flex-grow border border-amber-400/50 text-amber-400 py-4 rounded-xl font-black uppercase text-xs tracking-tight hover:bg-amber-400 hover:text-black transition-all">
                         Register
                     </button>
                     <button type="button" onclick="window.location.href='adminlogin.html'" class="admin-trigger px-4 rounded-xl text-[10px] font-black uppercase tracking-widest">
@@ -125,6 +125,7 @@
     </main>
 
 <script>
+// UI HANDLING
 function runScramble(el) {
     if (!el) return;
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&";
@@ -150,40 +151,80 @@ function toggleAuth() {
 window.addEventListener('mousemove', (e) => {
     document.getElementById('spotlight').style.setProperty('--mouse-x', `${e.clientX}px`);
     document.getElementById('spotlight').style.setProperty('--mouse-y', `${e.clientY}px`);
-
-    document.querySelectorAll('.mag-wrap').forEach(m => {
-        const r = m.getBoundingClientRect();
-        const mX = r.left + r.width / 2;
-        const mY = r.top + r.height / 2;
-        const dist = Math.hypot(e.clientX - mX, e.clientY - mY);
-        m.style.transform = dist < 100 ? `translate(${(e.clientX - mX) * 0.1}px, ${(e.clientY - mY) * 0.1}px)` : `translate(0,0)`;
-    });
 });
 
+// AUTH LOGIC
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('loginBtn');
-    btn.innerText = "WAIT...";
+    const emailValue = document.getElementById('loginId').value;
+    btn.innerText = "VERIFYING...";
+    
+    // Step 1: Force clear any old session data to prevent bugs
+    localStorage.removeItem('gainz_user');
     
     try {
         const response = await fetch('http://127.0.0.1:5000/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                email: document.getElementById('loginId').value, 
+                email: emailValue, 
                 password: document.getElementById('loginPass').value 
             })
         });
         const result = await response.json();
+        
         if (result.status === "success") {
+            // Step 2: Save everything Python sends (email, first_name, last_name)
+            localStorage.setItem('gainz_user', JSON.stringify({
+                email: result.email || emailValue,
+                first_name: result.first_name, // Pulling from Python response
+                last_name: result.last_name,   // Pulling from Python response
+                isLoggedIn: true,
+                timestamp: new Date().getTime()
+            }));
+            
             window.location.href = "home.html";
         } else {
             alert(result.message);
             btn.innerText = "Initialize";
         }
     } catch (err) {
-        alert("API Offline");
+        alert("API Offline - Ensure Python server is running.");
         btn.innerText = "Initialize";
+    }
+});
+
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('regBtn');
+    btn.innerText = "CREATING...";
+
+    const userData = {
+        first_name: document.getElementById('regFirstName').value,
+        last_name: document.getElementById('regLastName').value,
+        email: document.getElementById('regEmail').value,
+        password: document.getElementById('regPass').value
+    };
+
+    try {
+        const response = await fetch('http://127.0.0.1:5000/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+        const result = await response.json();
+
+        if (result.status === "success") {
+            alert("Protocol Created! Switch to login.");
+            toggleAuth();
+        } else {
+            alert(result.message);
+        }
+    } catch (err) {
+        alert("API Offline");
+    } finally {
+        btn.innerText = "Register";
     }
 });
 
